@@ -27,9 +27,9 @@ GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
  
 distance_list = []
-empty_tank_dist = 28  # cm, this is from the top of the tank to the top of the
+empty_tank_dist = 26  # cm, this is from the top of the tank to the top of the
                      # drainage square
-full_tank_dist = 24  # cm, CHANGE LATER
+full_tank_dist = 22  # cm, CHANGE LATER
 num_average_elements = 1  # average last 5 distance values
 
 
