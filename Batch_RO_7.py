@@ -1,5 +1,6 @@
 #Libraries
 import RPi.GPIO as GPIO
+import statistics
 import time
  
 #GPIO Mode (BOARD / BCM)
@@ -26,9 +27,9 @@ GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
  
 distance_list = []
-empty_tank_dist = 23  # cm, this is from the top of the tank to the top of the
+empty_tank_dist = 28  # cm, this is from the top of the tank to the top of the
                      # drainage square
-full_tank_dist = 15  # cm, CHANGE LATER
+full_tank_dist = 24  # cm, CHANGE LATER
 num_average_elements = 1  # average last 5 distance values
 
 
@@ -36,7 +37,7 @@ num_average_elements = 1  # average last 5 distance values
 conductivity_list = [10, 12, 10, 12, 15, 13, 14, 10, 11, 12, 10, 15, 12, 13, 15, 10] # mS/cm
 #conductivity_list = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10] # mS/cm
 feed_conductivity = 10 # mS/cm
- 
+raw_distance_list = [10,10,10,10]
 def distance():
     '''
     Ultrasonic Sensor Code to calculate distances and store
@@ -68,15 +69,33 @@ def distance():
     # multiply with the sonic speed (34300 cm/s)
     # and divide by 2, because there and back
     current_distance = (TimeElapsed * 34300) / 2
-   # print("current distance is ")
-   # print(current_distance)
+  #  print("current distance is ",current_distance)
  
-   # distance_list.append(current_distance)
+    raw_distance_list.append(current_distance)
     
-   # last_num_average = sum(distance_list[-num_average_elements:])/len(distance_list[-num_average_elements:])
-            # average distance value
+   #last_num_average = sum(distance_list[-num_average_elements:])/len(distance_list[-num_average_elements:])
+    # average distance value
     
-    return  current_distance # last_num_average
+    
+    
+    if len(raw_distance_list) >= 5:
+    
+        distance_sample = raw_distance_list[-5:] # sample includes last 4 measurements taken
+      #  print(f"distance sample is {distance_sample}")
+        std_dev_sample = statistics.stdev(distance_sample) # standard deviation of the last 4 digits 
+      #  print(f"std is {std_dev_sample}")  
+        mean_sample = statistics.mean(distance_sample)
+        if abs(raw_distance_list[-1] - mean_sample) <= std_dev_sample: # if the distance is within the standard deviation of the sample from the mean
+           # print("PASS: diff = ",(raw_distance_list[-1] - mean_sample)) 
+            return raw_distance_list[-1]
+        
+
+        else:
+            # remove element from the sample return the mean of the remaining 3 
+            distance_sample.remove(raw_distance_list[-1])
+            new_distance = (statistics.mean(raw_distance_list[-5:-2])) 
+          #  print("FAIL : new distance is ", new_distance)
+            return new_distance
 
 
 def check_tank_empty(last_num_average):
@@ -92,7 +111,7 @@ def check_tank_empty(last_num_average):
     '''
     
     tank_is_empty = False
-
+   # print(f"last_num_average is {last_num_average}")
     if last_num_average >= empty_tank_dist: # if tank is empty 
         
         tank_is_empty = True
@@ -148,26 +167,7 @@ def check_salinity(conductivity_list):
         print("Batch tank valve is open")
         return average_conductivity
     
-> def is_within_2(current_distance):
 
-    '''
-    Takes in a distance measurement, and if that is within 2 cm of the previous measurment,
-    then it returns true. If not, returns false.
-    
-    Args:
-        An integer representing the distance measurement in cm 
-        
-    Returns:
-        True if the distance measurement is within 2 cm of the previous one
-        False if the distance measurement is not within 2 cm of the previous one
-    '''
-         
-    if abs(current_distance - previous_measurement) <= 2:
-        previous_measurement = current_distance  
-        return True
-    else:
-        previous_measurement = previous_measurement # keep the old previous measurement 
-        return False
       
 
 if __name__ == '__main__':
@@ -217,7 +217,7 @@ if __name__ == '__main__':
                 else:
                     while elapsed_time >= 9:
 
-                        
+                        time.sleep(0.7)
                        # After 9 seconds of draining, close brine valve and resume regular filling
                         
                         
@@ -266,3 +266,4 @@ if __name__ == '__main__':
     finally:     
         GPIO.cleanup()
  
+
