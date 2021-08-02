@@ -3,6 +3,9 @@ import RPi.GPIO as GPIO
 import statistics
 import time
 import csv 
+import serial
+
+#The scale should be plugged into the bottom left USB port if you look at it from the front
 
 #set GPIO Pins for Ultrasonic Sensor
 GPIO_TRIGGER = 21 
@@ -24,7 +27,22 @@ SPIMISO_2 = 27
 SPIMOSI_2 = 17
 SPICS_2 = 24
 
+def init_serial():
+    global ser
 
+    #writing C, P, LF (\n)
+    #1 == 1
+    #C = 67, P = 80, \n = 10
+    init_message = [49, 80, 10]
+
+    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=9600,
+                         parity=serial.PARITY_NONE,
+                          stopbits=serial.STOPBITS_TWO,
+                           bytesize=serial.EIGHTBITS,
+                            timeout=0)
+
+    ser.write(init_message)
+    
 def init():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
@@ -64,9 +82,11 @@ time_step = 0.5 # seconds
 empty_tank_dist = 26  # cm, top of the tank to the top of the drainage square with some extra room 
 full_tank_dist = 22  # cm 
 num_average_elements = 1  # average last 1 distance values
-
+took_scale_data = 0 
 # LIST SETUP ----------------------------------------
 rows = []
+time_list = []
+permeate_mass_list = []
 distance_list = []
 current_distance_list = []
 conductivity_list = []
@@ -75,6 +95,51 @@ feed_conductivity = 10 # mS/cm
 raw_distance_list = [10,10,10,10] # arbitrary values to get the standard dev. things to work
 
 # FUNCTIONS -----------------------------------------
+
+def scale_reading():
+    '''
+    Reads scale data and adds it to permeate_mass_list
+    '''
+    init_serial()
+    data = ''
+    units = ''
+    took_scale_data = 0
+    
+    while took_scale_data == 0:
+        c = ser.read()
+        if c:
+            char = str(c)
+            char = char[-2]
+            if char == 'r' or char == 'n': # if the scale data is readable
+     
+                if data == '': 
+                    continue
+                else:
+                    
+                    data = data.replace(" ","")
+                    for i in data:
+                        if i.isalpha():
+                            units += i
+                            data = data.replace(i,"") # replaces any letters in data (like g)
+                        elif i == '?':
+                            data = data.replace(i,"")
+                                
+                    print(" Permeate mass = %.1f g" % int(float(data)))
+                    if(data == ''):
+                        continue
+                    else:
+                        permeate_mass_list.append(data)
+                        took_scale_data = 1
+                
+                    data = ''
+                    stable = 1
+                    units = ''
+
+            else:
+                data += char
+  
+    ser.close()
+
 
 def readadc(adcnum, clockpin, mosipin, misopin, cspin):
     '''
@@ -148,8 +213,8 @@ def distance():
     current_distance = (TimeElapsed * 34300) / 2
   #  print("current distance is ",current_distance)
  
-    raw_distance_list.append(current_distance)
-    current_distance_list.append(current_distance)
+    raw_distance_list.append(int(current_distance))
+    current_distance_list.append(int(current_distance))
     
     
     if len(raw_distance_list) >= 5:
@@ -235,7 +300,19 @@ def conductivity_reading():
     conductivity_list.append(conductivity)
     
     return conductivity_list, conductivity 
+
+def time_readings(time_now):
+    '''
+    Takes the current time and adds it to a list. 
     
+    Args:
+        current_time: An integer representing the current time in seconds
+    Returns:
+        time_list: A list of recorded times
+    '''
+    time_list.append(time_now)
+    return time_list
+
 def flowrate_reading():
     
     '''
@@ -303,7 +380,7 @@ def check_salinity(conductivity_list):
         return average_conductivity
 
 
-def data_formatting(conductivity_list, current_distance_list, current_flowrate_list):
+def data_formatting(time_list, conductivity_list, current_distance_list, current_flowrate_list, permeate_mass_list):
    
     '''
     Formats the raw data and compiles it into a csv file called DATA.csv.
@@ -315,12 +392,10 @@ def data_formatting(conductivity_list, current_distance_list, current_flowrate_l
         current_flowrate_list: a list of measured flowrates taken every time step
     '''
     
-    headers = ['Time (seconds)',  'Conductivity (mS)', 'Measured distance (cm)', 'Flowrate (mL/min)']
+    headers = ['Time (seconds)',  'Conductivity (mS)', 'Measured distance (cm)', 'Flowrate (mL/min)', 'Permeate mass (g)']
     
-    time = 0   
     for entry in range(len(conductivity_list)):
-        rows.append([time, conductivity_list[entry], current_distance_list[entry], current_flowrate_list[entry]])
-        time += time_step
+        rows.append([time_list[entry], conductivity_list[entry], current_distance_list[entry], current_flowrate_list[entry], permeate_mass_list[entry]])
                 
     # NAME OF CSV FILE
     filename = "DATA.csv"
@@ -332,13 +407,18 @@ def data_formatting(conductivity_list, current_distance_list, current_flowrate_l
         
 def main():
     init()
+    init_serial()
     #time.sleep(2)
     while True:
        
+        # Regular sensor data collecting when tank is draining
         conductivity_reading()        
         average_distance = distance()
         current_flowrate, current_flowrate_list = flowrate_reading()
-        
+        time_now = time.time() - beginning_time
+        time_readings(time_now)
+        scale_reading()
+
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
         print ("REGULAR OPERATION... DRAINING BATCH TANK")
@@ -352,32 +432,37 @@ def main():
                    
             volume_flushed = 0
             last_flowrate = 0
+            time_step_flushing = 1 # this is 1 sec on average
             print("TANK IS EMPTY")
-                    
-            while volume_flushed < 72 and tank_is_full == False: 
-                    
-            #   Fill the tank and drain the brine for 9 seconds if the tank is empty 
+            
+            while volume_flushed < 72 and tank_is_full == False:
+               #   Fill the tank and drain the brine until 72 ml has been flushed 
+
+                
+                time_then = time.time()    
                 conductivity_reading()
                 average_distance = distance()
                 current_flowrate, current_flowrate_list = flowrate_reading()
+                scale_reading()
+                time_now = time.time() - beginning_time
+                time_readings(time_now)
                 
-                added_volume = volume_step_approximation(time_step, last_flowrate, current_flowrate)
+                added_volume = volume_step_approximation(time_step_flushing, last_flowrate, current_flowrate)
                 volume_flushed += added_volume
-                
+                print("Volume flushed is = %.1f ml" % volume_flushed)
                 last_flowrate = current_flowrate
                 
-                print("Time: %.1f seconds" % elapsed_time)
                 time.sleep(time_step)                    
                 print("FLUSHING... WAITING 9 SECONDS")
                 GPIO.output(16,GPIO.LOW) # relay is ON, so Brine valve is open
                 Brine_valve_open = 1
-        
                 GPIO.output(13,GPIO.LOW) # relay is ON, so Batch valve is closed
                 GPIO.output(12,GPIO.LOW) # relay is ON, so Feed valve is open
-                             
+                time_step_flushing = time.time() - time_then
+                
             else:
                 while volume_flushed >= 72:
-                # After 9 seconds of draining, close Brine valve and resume regular filling
+                # After 9 seconds of draining, close Brine valve, open Batch valve and resume regular filling
 
                     time.sleep(time_step)
                             
@@ -385,7 +470,10 @@ def main():
                     conductivity_reading()
                     average_distance = distance()
                     current_flowrate, current_flowrate_list = flowrate_reading()
-                    
+                    time_now = time.time() - beginning_time
+                    time_readings(time_now)
+                    scale_reading()
+ 
                     tank_is_full = check_tank_full(average_distance)
                           
                     print ("Measured Distance = %.1f cm" % average_distance)
@@ -400,12 +488,17 @@ def main():
                     
             if tank_is_full == True:
                         
+                # Turn the feed valve off if the tank is full
+                
                 GPIO.output(12,GPIO.HIGH) # relay is OFF, so Feed valve is closed
                 print("TANK IS FULL") 
                 conductivity_reading()
                 average_distance = distance()
                 current_flowrate, current_flowrate_list = flowrate_reading()
-
+                time_now = time.time() - beginning_time
+                time_readings(time_now)
+                scale_reading()
+   
                 if Brine_valve_open == 1: # if the Brine valve is currently open 
                             
                     print("FLUSHING... WAITING 9 SECONDS")
@@ -413,7 +506,10 @@ def main():
                     conductivity_reading()
                     average_distance = distance()                       
                     current_flowrate, current_flowrate_list = flowrate_reading()
-
+                    time_now = time.time() - beginning_time
+                    time_readings(time_now)
+                    scale_reading()
+                
                     GPIO.output(16,GPIO.HIGH) # relay is OFF, so Brine valve is closed
                     Brine_valve_open = 0
                             
@@ -427,11 +523,8 @@ if __name__ == '__main__':
         main()         
     except KeyboardInterrupt: # Stop measurements by pressing CTRL + C and also write data to csv
         print("Measurement stopped by User")
-        end_time = time.time()
-        total_time =  end_time - beginning_time
-        print("Total time: %.1f seconds" %total_time)
-
-        data_formatting(conductivity_list,current_distance_list,current_flowrate_list)
+        print(len(time_list), len(conductivity_list), len(current_distance_list), len(flowrate_list), len(permeate_mass_list))
+        data_formatting(time_list, conductivity_list,current_distance_list,flowrate_list, permeate_mass_list)
 
     finally:     
         GPIO.cleanup()

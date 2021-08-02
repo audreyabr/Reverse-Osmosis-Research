@@ -69,6 +69,7 @@ num_average_elements = 1  # average last 1 distance values
 
 # LIST SETUP ----------------------------------------
 rows = []
+time_list = []
 distance_list = []
 current_distance_list = []
 conductivity_list = []
@@ -236,7 +237,19 @@ def conductivity_reading():
     
     conductivity_list.append(conductivity)
     
-    return conductivity_list, conductivity 
+    return conductivity_list, conductivity
+
+def time_readings(time_now):
+    '''
+    Takes the current time and adds it to a list. 
+    
+    Args:
+        current_time: An integer representing the current time in seconds
+    Returns:
+        time_list: A list of recorded times
+    '''
+    time_list.append(time_now)
+    return time_list
     
 def flowrate_reading():
     
@@ -287,7 +300,7 @@ def check_salinity(conductivity_list):
         return average_conductivity
 
 
-def data_formatting(total_time, conductivity_list, current_distance_list):
+def data_formatting(time_list, conductivity_list, current_distance_list):
    
     '''
     Formats the raw data and compiles it into a csv file called DATA.csv.
@@ -300,12 +313,12 @@ def data_formatting(total_time, conductivity_list, current_distance_list):
     
     headers = ['Time (seconds)',  'Conductivity (mS)', 'Measured distance (cm)']
     
-    time = 0 
+    #time = 0 
     for entry in range(len(conductivity_list)):
         
-        time_increment = total_time/len(conductivity_list)
-        rows.append([time, conductivity_list[entry], current_distance_list[entry]])
-        time += time_increment
+        #time_increment = total_time/len(conductivity_list)
+        rows.append([time_list[entry], conductivity_list[entry], current_distance_list[entry]])
+        #time += time_increment
                 
     # NAME OF CSV FILE
     filename = "DATA.csv"
@@ -327,6 +340,9 @@ def main():
         average_distance = distance()
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
+        time_now = time.time() - beginning_time
+        time_readings(time_now)
+        
         print ("REGULAR OPERATION... DRAINING BATCH TANK")
         print ("Measured Distance = %.1f cm" % average_distance)
         time.sleep(time_step)
@@ -344,8 +360,10 @@ def main():
             #   Fill the tank and drain the brine for 9 seconds if the tank is empty 
                 conductivity_reading()
                 average_distance = distance()
-
                 current_time = time.time()
+                time_now = time.time() - beginning_time
+                time_readings(time_now)
+
                 elapsed_time = current_time - start_time
                 print("Time: %.1f seconds" % elapsed_time)
                 time.sleep(time_step)                    
@@ -358,13 +376,15 @@ def main():
                              
             else:
                 while elapsed_time >= 9:
-                 # After 9 seconds of draining, close Brine valve and resume regular filling
+                    # After 9 seconds of draining, close Brine valve and resume regular filling
 
                     time.sleep(time_step)
                             
                     print("FILLING BATCH TANK")
                     conductivity_reading()
                     average_distance = distance()
+                    time_now = time.time() - beginning_time
+                    time_readings(time_now)
                     
                     tank_is_full = check_tank_full(average_distance)
                           
@@ -379,7 +399,7 @@ def main():
                         break 
                     
             if tank_is_full == True:
-                        
+                    
        
                 GPIO.output(12,GPIO.HIGH) # relay is OFF, so Feed valve is closed
                 print("TANK IS FULL") 
@@ -392,7 +412,10 @@ def main():
                     time.sleep(9)
                     conductivity_reading()
                     average_distance = distance()                       
-
+                    time_now = time.time() - beginning_time
+                    time_readings(time_now)
+                    print(time_now)
+                    
                     GPIO.output(16,GPIO.HIGH) # relay is OFF, so Brine valve is closed
                     Brine_valve_open = 0
                             
@@ -406,11 +429,8 @@ if __name__ == '__main__':
         main()         
     except KeyboardInterrupt: # Stop measurements by pressing CTRL + C and also write data to csv
         print("Measurement stopped by User")
-        end_time = time.time()
-        total_time =  end_time - beginning_time
-        print("Total time: %.1f seconds" %total_time)
-        data_formatting(total_time, conductivity_list,current_distance_list)
-
+        print(len(time_list), len(conductivity_list), len(current_distance_list))
+        data_formatting(time_list, conductivity_list,current_distance_list)
     finally:     
         GPIO.cleanup()
  
