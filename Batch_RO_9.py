@@ -17,7 +17,6 @@ SPIMISO = 9
 SPIMOSI = 10
 SPICS = 8
 
-
 #setup Voltmeter 2 Pins for Digital Flowmeter
 AO_pin_2 = 0  # what is this?
 SPICLK_2 = 22
@@ -25,8 +24,7 @@ SPIMISO_2 = 27
 SPIMOSI_2 = 17
 SPICS_2 = 24
 
-        
-        
+
 def init():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
@@ -220,7 +218,7 @@ def conductivity_reading():
     
     Returns:
         conductivity: an integer representing the current conductivity in mS
-        conductivity_list : a list of conductivity measurements 
+        conductivity_list: a list of conductivity measurements 
     '''
     
     # Voltmeter
@@ -254,13 +252,31 @@ def flowrate_reading():
     voltage = ad_value*(3.3/1024)*5
     print (" Voltage 2 is: " + str("%.2f"%voltage)+"V")
     
-    flowrate = voltage
+    flowrate = voltage*200
     
     flowrate_list.append(flowrate)
     
     return flowrate, flowrate_list
     
- 
+def volume_step_approximation(time_step, last_flowrate, current_flowrate):
+    
+    '''
+    Calculates the step volume of water (mL) that flowed through the pipe system by approximating the
+    integral of flowrate data using the Midpoint Rule. 
+    This function helps calculate whether the brine has been flushed from the system
+    
+    Args:
+        time_step: an integer representing the time step from the last volume measurement taken
+        last_flowrate: an integer representing the last flowrate measurement taken in mL/min 
+        current_flowrate: an integer representing the current flowrate in mL/min
+        
+    Returns:
+        volume_step: an integer representing the volume that flowed through the meter within the timestep (mL)
+    '''
+    
+    volume_step = ((last_flowrate + current_flowrate)/2) * time_step
+    
+    return volume_step
     
     
 def check_salinity(conductivity_list):
@@ -271,7 +287,7 @@ def check_salinity(conductivity_list):
     Args:
         conductivity_list: A list of measured conductivities
     
-    Returns: 
+    Returns:
         average_conductivity: An integer representing the averaged conductivity readings
           with number of elements specified by num_average_elements
     '''
@@ -287,25 +303,24 @@ def check_salinity(conductivity_list):
         return average_conductivity
 
 
-def data_formatting(total_time, conductivity_list, current_distance_list):
+def data_formatting(conductivity_list, current_distance_list, current_flowrate_list):
    
     '''
     Formats the raw data and compiles it into a csv file called DATA.csv.
-    DATA.csv contains time, distance, and conductivity measurements.
+    DATA.csv contains time, distance, conductivity, and flowrate measurments. 
     
     Args:
         conductivity list: a list of measured conductivites taken every time step
         current_distance_list: a list of ultrasonic sensor distances taken every time step
+        current_flowrate_list: a list of measured flowrates taken every time step
     '''
     
-    headers = ['Time (seconds)',  'Conductivity (mS)', 'Measured distance (cm)']
+    headers = ['Time (seconds)',  'Conductivity (mS)', 'Measured distance (cm)', 'Flowrate (mL/min)']
     
-    time = 0 
+    time = 0   
     for entry in range(len(conductivity_list)):
-        
-        time_increment = total_time/len(conductivity_list)
-        rows.append([time, conductivity_list[entry], current_distance_list[entry]])
-        time += time_increment
+        rows.append([time, conductivity_list[entry], current_distance_list[entry], current_flowrate_list[entry]])
+        time += time_step
                 
     # NAME OF CSV FILE
     filename = "DATA.csv"
@@ -313,18 +328,17 @@ def data_formatting(total_time, conductivity_list, current_distance_list):
     with open(filename, 'w') as csvfile: 
         csvwriter = csv.writer(csvfile) 
         csvwriter.writerow(headers) 
-        csvwriter.writerows(rows)
-        
+        csvwriter.writerows(rows)    
         
 def main():
     init()
     #time.sleep(2)
-    time_taken = 0 
-    
     while True:
- 
+       
         conductivity_reading()        
         average_distance = distance()
+        current_flowrate, current_flowrate_list = flowrate_reading()
+        
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
         print ("REGULAR OPERATION... DRAINING BATCH TANK")
@@ -335,18 +349,23 @@ def main():
         brine_valve_open = 0 
       
         if tank_is_empty == True:
-                    
-            start_time = time.time()
+                   
+            volume_flushed = 0
+            last_flowrate = 0
             print("TANK IS EMPTY")
                     
-            while elapsed_time < 9 and tank_is_full == False: 
+            while volume_flushed < 72 and tank_is_full == False: 
                     
             #   Fill the tank and drain the brine for 9 seconds if the tank is empty 
                 conductivity_reading()
                 average_distance = distance()
-
-                current_time = time.time()
-                elapsed_time = current_time - start_time
+                current_flowrate, current_flowrate_list = flowrate_reading()
+                
+                added_volume = volume_step_approximation(time_step, last_flowrate, current_flowrate)
+                volume_flushed += added_volume
+                
+                last_flowrate = current_flowrate
+                
                 print("Time: %.1f seconds" % elapsed_time)
                 time.sleep(time_step)                    
                 print("FLUSHING... WAITING 9 SECONDS")
@@ -357,14 +376,15 @@ def main():
                 GPIO.output(12,GPIO.LOW) # relay is ON, so Feed valve is open
                              
             else:
-                while elapsed_time >= 9:
-                 # After 9 seconds of draining, close Brine valve and resume regular filling
+                while volume_flushed >= 72:
+                # After 9 seconds of draining, close Brine valve and resume regular filling
 
                     time.sleep(time_step)
                             
                     print("FILLING BATCH TANK")
                     conductivity_reading()
                     average_distance = distance()
+                    current_flowrate, current_flowrate_list = flowrate_reading()
                     
                     tank_is_full = check_tank_full(average_distance)
                           
@@ -380,11 +400,11 @@ def main():
                     
             if tank_is_full == True:
                         
-       
                 GPIO.output(12,GPIO.HIGH) # relay is OFF, so Feed valve is closed
                 print("TANK IS FULL") 
                 conductivity_reading()
-                average_distance = distance()                       
+                average_distance = distance()
+                current_flowrate, current_flowrate_list = flowrate_reading()
 
                 if Brine_valve_open == 1: # if the Brine valve is currently open 
                             
@@ -392,6 +412,7 @@ def main():
                     time.sleep(9)
                     conductivity_reading()
                     average_distance = distance()                       
+                    current_flowrate, current_flowrate_list = flowrate_reading()
 
                     GPIO.output(16,GPIO.HIGH) # relay is OFF, so Brine valve is closed
                     Brine_valve_open = 0
@@ -409,10 +430,12 @@ if __name__ == '__main__':
         end_time = time.time()
         total_time =  end_time - beginning_time
         print("Total time: %.1f seconds" %total_time)
-        data_formatting(total_time, conductivity_list,current_distance_list)
+
+        data_formatting(conductivity_list,current_distance_list,current_flowrate_list)
 
     finally:     
         GPIO.cleanup()
  
+
 
 
