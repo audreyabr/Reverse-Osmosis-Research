@@ -4,16 +4,22 @@ import statistics
 import time
 import csv 
 import serial
+from datetime import datetime 
+import os
+import pathlib
 
-############ IMPORTANT INFO #####################
+############ READ ME: IMPORTANT INFO #####################
 
 # To stop data collection, you must do Ctrl + c  (KeyboardInterrupt)
 # to actually record the data. Don't click the stop button or nothing will be writted in csv.
+
+# Data will be written in the folder CSV_data and a new file would be added every time
 
 # The scale should be plugged into the bottom left USB port of the Pi if you look at it from the front
 
 # Make sure that the conductivity transmitter and digital flowmeter are plugged into power and turned on 
 
+# For some reason this code doesn't work if you run it in terminal so just run it in Thonny 
 #################################################
 
 #set GPIO Pins for Ultrasonic Sensor
@@ -233,7 +239,8 @@ def distance():
         distance_sample = raw_distance_list[-5:] # sample includes last 5 measurements taken
         std_dev_sample = statistics.stdev(distance_sample) # standard deviation of the last 5 digits 
         mean_sample = statistics.mean(distance_sample)
-        if abs(raw_distance_list[-1] - mean_sample) <= std_dev_sample: # if the distance is within the standard deviation of the sample from the mean
+        if abs(raw_distance_list[-1] - mean_sample) <= std_dev_sample:
+            # if the distance is within the standard deviation of the sample from the mean
             new_distance = raw_distance_list[-1]
             return new_distance
         
@@ -249,7 +256,8 @@ def check_tank_empty(last_distance):
     Checks whether the batch tank is empty.
     
     Args:
-        last_distance: A integer representing the average measured distance from the ultrasonic sensor
+        last_distance: A integer representing the average measured distance
+        from the ultrasonic sensor
         
     Returns:
         tank_is_empty: Either True or False if the batch tank is empty 
@@ -379,7 +387,8 @@ def volume_step_approximation(time_step, last_flowrate, current_flowrate):
 #         average_conductivity: An integer representing the averaged conductivity readings
 #           with number of elements specified by num_average_elements
 #     '''
-#     average_conductivity = sum(conductivity_list[-num_average_elements:])/len(conductivity_list[-num_average_elements:]) 
+#     average_conductivity = (sum(conductivity_list[-num_average_elements:])/
+#                 len(conductivity_list[-num_average_elements:]))
 #             # average conductivity value
 #                 
 #     if average_conductivity == feed_conductivity:
@@ -391,7 +400,8 @@ def volume_step_approximation(time_step, last_flowrate, current_flowrate):
 #         return average_conductivity
 
 
-def data_formatting(time_list, conductivity_list, current_distance_list, current_flowrate_list, permeate_mass_list, time_end):
+def data_formatting(time_list, conductivity_list, current_distance_list,
+                    current_flowrate_list, permeate_mass_list, time_end):
    
     '''
     Formats the raw data and compiles it into a csv file called DATA.csv.
@@ -403,7 +413,8 @@ def data_formatting(time_list, conductivity_list, current_distance_list, current
         current_flowrate_list: a list of measured flowrates taken every time step
     '''
     
-    # Makes sure that the lists are equal size 
+    # Makes sure that the lists are equal size
+    
     if ((len(time_list) + len(conductivity_list) + len(current_distance_list)
         + len(flowrate_list)+ len(permeate_mass_list))/5) != 1:
                     
@@ -429,14 +440,27 @@ def data_formatting(time_list, conductivity_list, current_distance_list, current
     for entry in range(len(conductivity_list)):
         rows.append([time_list[entry], conductivity_list[entry], current_distance_list[entry],
                      current_flowrate_list[entry], permeate_mass_list[entry]])
-    # NAME OF CSV FILE
-    filename = "DATA.csv"
     
-    with open(filename, 'w') as csvfile: 
-        csvwriter = csv.writer(csvfile) 
-        csvwriter.writerow(headers) 
-        csvwriter.writerows(rows)    
-        
+    # WRITING TO A CSV FILE IN THE FOLDER "CSV_dara"
+
+    date = datetime.today().strftime('%Y-%m-%d')    
+# 
+
+    try:
+        os.mkdir("./CSV_data")
+    except OSError as e:
+        print("Directory exists")
+    
+    index = len(os.listdir("CSV_data"))
+    filename = str(index) + '_' + date + '.csv'  
+
+    if not os.path.exists(filename):
+        with open("./CSV_data/" + filename,'w',newline='') as csvfile:
+            csvwriter = csv.writer(csvfile) 
+            csvwriter.writerow(headers) 
+            csvwriter.writerows(rows)   
+
+
 def main():
     init()
     init_serial()
@@ -453,7 +477,7 @@ def main():
 
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
-        print ("REGULAR OPERATION... DRAINING BATCH TANK")
+        print ("-----REGULAR OPERATION... DRAINING BATCH TANK-----")
         print ("Measured Distance = %.1f cm" % average_distance)
         time.sleep(time_step)
                         
@@ -465,7 +489,7 @@ def main():
             volume_flushed = 0
             last_flowrate = 0
             time_step_flushing = 1 # this is 1 sec on average
-            print("TANK IS EMPTY")
+            print("-----TANK IS EMPTY-----")
             
             while volume_flushed < 72 and tank_is_full == False:
                #   Fill the tank and drain the brine until 72 ml has been flushed 
@@ -486,7 +510,7 @@ def main():
                 last_flowrate = current_flowrate
                 
                 time.sleep(time_step)                    
-                print("FLUSHING... WAITING 9 SECONDS")
+                print("-----FLUSHING... WAITING 9 SECONDS-----")
                 GPIO.output(16,GPIO.LOW) # relay is ON, so Brine valve is open
                 Brine_valve_open = 1
                 GPIO.output(13,GPIO.LOW) # relay is ON, so Batch valve is closed
@@ -495,11 +519,12 @@ def main():
                 
             else:
                 while volume_flushed >= 72:
-                # After 9 seconds of draining, close Brine valve, open Batch valve and resume regular filling
+                # After 9 seconds of draining, close Brine valve,
+                # open Batch valve and resume regular filling
 
                     time.sleep(time_step)
                             
-                    print("FILLING BATCH TANK")
+                    print("-----FILLING BATCH TANK-----")
                     conductivity_reading()
                     average_distance = distance()
                     current_flowrate, current_flowrate_list = flowrate_reading()
@@ -524,7 +549,7 @@ def main():
                 # Turn the feed valve off if the tank is full
                 
                 GPIO.output(12,GPIO.HIGH) # relay is OFF, so Feed valve is closed
-                print("TANK IS FULL") 
+                print("-----TANK IS FULL-----") 
                 conductivity_reading()
                 average_distance = distance()
                 current_flowrate, current_flowrate_list = flowrate_reading()
@@ -534,7 +559,7 @@ def main():
    
                 if Brine_valve_open == 1: # if the Brine valve is currently open 
                             
-                    print("FLUSHING... WAITING 9 SECONDS")
+                    print("-----FLUSHING... WAITING 9 SECONDS-----")
                     time.sleep(9)
                     conductivity_reading()
                     average_distance = distance()                       
@@ -557,11 +582,10 @@ if __name__ == '__main__':
     except KeyboardInterrupt: # Stop measurements by pressing CTRL + C and also write data to csv
         time_end = time.time() - beginning_time 
         
-        print("Measurement stopped!")
-#         print(len(time_list), len(conductivity_list), len(current_distance_list),
-#               len(flowrate_list), len(permeate_mass_list))
-#         
-        data_formatting(time_list, conductivity_list,current_distance_list,flowrate_list, permeate_mass_list, time_end)
+        print("-----Measurement stopped!-----")
+        
+        data_formatting(time_list, conductivity_list,current_distance_list,
+                        flowrate_list, permeate_mass_list, time_end)
 
     finally:     
         GPIO.cleanup()
