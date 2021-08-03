@@ -332,8 +332,7 @@ def data_formatting(time_list, conductivity_list, current_distance_list):
 def main():
     init()
     #time.sleep(2)
-    time_taken = 0 
-    
+     
     while True:
  
         conductivity_reading()        
@@ -342,7 +341,6 @@ def main():
         tank_is_full = check_tank_full(average_distance)
         time_now = time.time() - beginning_time
         time_readings(time_now)
-        
         print ("REGULAR OPERATION... DRAINING BATCH TANK")
         print ("Measured Distance = %.1f cm" % average_distance)
         time.sleep(time_step)
@@ -405,7 +403,9 @@ def main():
                 print("TANK IS FULL") 
                 conductivity_reading()
                 average_distance = distance()                       
-
+                time_now = time.time() - beginning_time
+                time_readings(time_now)
+                
                 if Brine_valve_open == 1: # if the Brine valve is currently open 
                             
                     print("FLUSHING... WAITING 9 SECONDS")
