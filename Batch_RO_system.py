@@ -40,7 +40,7 @@ AO_pin_2 = 0  # what is this?
 SPICLK_2 = 22
 SPIMISO_2 = 27
 SPIMOSI_2 = 17
-SPICS_2 = 24
+SPICS_2 = 23
 
 def init_serial():
     global ser
@@ -99,7 +99,8 @@ full_tank_dist = 22  # cm  (CHANGE LATER?)
 time_step = 0.50 # seconds (this is not actually the real time step between data points)
 num_average_elements = 1  # average last 1 distance values
 took_scale_data = 0 # this helps with the scale data collecting
-
+flow_loop_volume = 150 # ml
+ 
 # LIST SETUP ----------------------------------------
 rows = []
 time_list = []
@@ -242,12 +243,14 @@ def distance():
         if abs(raw_distance_list[-1] - mean_sample) <= std_dev_sample:
             # if the distance is within the standard deviation of the sample from the mean
             new_distance = raw_distance_list[-1]
+            print ("Measured Distance = %.1f cm" % new_distance)
             return new_distance
         
         else:
             # remove element from the sample return the mean of the remaining 3 
             distance_sample.remove(raw_distance_list[-1])
             new_distance = (statistics.mean(raw_distance_list[-5:-2])) 
+            print ("Measured Distance = %.1f cm" % new_distance)
             return new_distance
 
 
@@ -307,7 +310,7 @@ def conductivity_reading():
     # Voltmeter
     ad_value = readadc(AO_pin, SPICLK, SPIMOSI, SPIMISO, SPICS)
     voltage = ad_value*(3.3/1024)*5
-    print (" Voltage 1 is: " + str("%.2f"%voltage)+"V")
+    #print (" Voltage 1 is: " + str("%.2f"%voltage)+"V")
     
     R = 604 # ohms
     K = 100 # constant set by the manufacturer
@@ -345,10 +348,10 @@ def flowrate_reading():
     # Voltmeter 2
     ad_value = readadc(AO_pin_2, SPICLK_2, SPIMOSI_2, SPIMISO_2, SPICS_2)
     voltage = ad_value*(3.3/1024)*5
-    print (" Voltage 2 is: " + str("%.2f"%voltage)+"V")
+#     print (" Voltage 2 is: " + str("%.2f"%voltage)+"V")
     
     flowrate = voltage*200
-    
+    print("Flowrate is: " + str("%.2f" %flowrate) + "mL/min")
     flowrate_list.append(flowrate)
     
     return flowrate, flowrate_list
@@ -370,7 +373,7 @@ def volume_step_approximation(time_step, last_flowrate, current_flowrate):
         the meter within the timestep (mL)
     '''
     
-    volume_step = ((last_flowrate + current_flowrate)/2) * time_step
+    volume_step = ((last_flowrate + current_flowrate)/2) *(time_step/60)
     
     return volume_step
     
@@ -478,7 +481,7 @@ def main():
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
         print ("-----REGULAR OPERATION... DRAINING BATCH TANK-----")
-        print ("Measured Distance = %.1f cm" % average_distance)
+        # print ("Measured Distance = %.1f cm" % average_distance)
         time.sleep(time_step)
                         
         elapsed_time = 0
@@ -491,7 +494,7 @@ def main():
             time_step_flushing = 1 # this is 1 sec on average
             print("-----TANK IS EMPTY-----")
             
-            while volume_flushed < 72 and tank_is_full == False:
+            while volume_flushed < flow_loop_volume and tank_is_full == False:
                #   Fill the tank and drain the brine until 72 ml has been flushed 
 
                 
@@ -510,7 +513,7 @@ def main():
                 last_flowrate = current_flowrate
                 
                 time.sleep(time_step)                    
-                print("-----FLUSHING... WAITING 9 SECONDS-----")
+                print("-----FLUSHING... WAITING TO FLUSH 150 ml FROM FLOW LOOP-----")
                 GPIO.output(16,GPIO.LOW) # relay is ON, so Brine valve is open
                 Brine_valve_open = 1
                 GPIO.output(13,GPIO.LOW) # relay is ON, so Batch valve is closed
