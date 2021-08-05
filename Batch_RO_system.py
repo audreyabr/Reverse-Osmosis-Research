@@ -231,27 +231,41 @@ def distance():
     current_distance = (TimeElapsed * 34300) / 2
   #  print("current distance is ",current_distance)
  
-    raw_distance_list.append(int(current_distance))
-    current_distance_list.append(int(current_distance))
+    raw_distance_list.append(current_distance)
+    current_distance_list.append(current_distance)
     
-    
+    print ("Measured Distance 1 = %.1f cm" % current_distance)
+  #  return current_distance
+
     if len(raw_distance_list) >= 5:
-    
+#
         distance_sample = raw_distance_list[-5:] # sample includes last 5 measurements taken
-        std_dev_sample = statistics.stdev(distance_sample) # standard deviation of the last 5 digits 
+        print(distance_sample)
+        distance_sample.sort()
+        distance_sample.pop(0)
+        distance_sample.pop(3)
         mean_sample = statistics.mean(distance_sample)
-        if abs(raw_distance_list[-1] - mean_sample) <= std_dev_sample:
-            # if the distance is within the standard deviation of the sample from the mean
-            new_distance = raw_distance_list[-1]
-            print ("Measured Distance = %.1f cm" % new_distance)
-            return new_distance
-        
-        else:
-            # remove element from the sample return the mean of the remaining 3 
-            distance_sample.remove(raw_distance_list[-1])
-            new_distance = (statistics.mean(raw_distance_list[-5:-2])) 
-            print ("Measured Distance = %.1f cm" % new_distance)
-            return new_distance
+        new_distance = mean_sample
+        print ("Measured Distance 2= %.1f cm" % new_distance)
+        return new_distance
+
+#     if len(raw_distance_list) >= 5:
+#     
+#         distance_sample = raw_distance_list[-5:] # sample includes last 5 measurements taken
+#         std_dev_sample = statistics.stdev(distance_sample) # standard deviation of the last 5 digits 
+#         mean_sample = statistics.mean(distance_sample)
+#         if abs(raw_distance_list[-1] - mean_sample) <= std_dev_sample:
+#             # if the distance is within the standard deviation of the sample from the mean
+#             new_distance = raw_distance_list[-1]
+#             print ("Measured Distance = %.1f cm" % new_distance)
+#             return new_distance
+#         
+#         else:
+#             # remove element from the sample return the mean of the remaining 3 
+#             distance_sample.remove(raw_distance_list[-1])
+#             new_distance = (statistics.mean(raw_distance_list[-5:-2])) 
+#             print ("Measured Distance = %.1f cm" % new_distance)
+#             return new_distance
 
 
 def check_tank_empty(last_distance):
