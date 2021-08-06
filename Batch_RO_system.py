@@ -234,7 +234,7 @@ def distance():
     raw_distance_list.append(current_distance)
     current_distance_list.append(current_distance)
     
-    print ("Measured Distance 1 = %.1f cm" % current_distance)
+    #print ("Measured Distance 1 = %.1f cm" % current_distance)
   #  return current_distance
 
     if len(raw_distance_list) >= 5:
@@ -246,7 +246,7 @@ def distance():
         distance_sample.pop(3)
         mean_sample = statistics.mean(distance_sample)
         new_distance = mean_sample
-        print ("Measured Distance 2= %.1f cm" % new_distance)
+        print ("Measured Distance = %.1f cm" % new_distance)
         return new_distance
 
 #     if len(raw_distance_list) >= 5:
@@ -603,7 +603,11 @@ if __name__ == '__main__':
         
         data_formatting(time_list, conductivity_list,current_distance_list,
                         flowrate_list, permeate_mass_list, time_end)
-
+        
+        GPIO.output(12,GPIO.HIGH) # relay is OFF initially
+        GPIO.output(16,GPIO.HIGH) # relay is OFF initially
+        GPIO.output(13,GPIO.HIGH) # relay is OFF initially
+        
     finally:     
         GPIO.cleanup()
  
