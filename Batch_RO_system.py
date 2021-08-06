@@ -240,7 +240,7 @@ def distance():
     if len(raw_distance_list) >= 5:
 #
         distance_sample = raw_distance_list[-5:] # sample includes last 5 measurements taken
-        print(distance_sample)
+        #print(distance_sample)
         distance_sample.sort()
         distance_sample.pop(0)
         distance_sample.pop(3)
@@ -313,11 +313,11 @@ def check_tank_full(last_distance):
 def conductivity_reading():
     '''
     Measures the voltage from the conductivity transmitter
-    and converts it to a conductivity reading (mS). Also adds these readings
+    and converts it to a conductivity reading (mS/cm). Also adds these readings
     to a list.
     
     Returns:
-        conductivity: an integer representing the current conductivity in mS
+        conductivity: an integer representing the current conductivity in mS/cm
         conductivity_list: a list of conductivity measurements 
     '''
     
@@ -330,7 +330,7 @@ def conductivity_reading():
     K = 100 # constant set by the manufacturer
     
     conductivity = ((2000 * voltage)/(16*0.001*R*K)) - ((4*2000)/(K*16))
-    print(" Conductivity: " + str("%.2f"%conductivity)+"mS")
+    print(" Conductivity: " + str("%.2f"%conductivity)+"mS/cm")
     
     conductivity_list.append(conductivity)
     
@@ -451,7 +451,7 @@ def data_formatting(time_list, conductivity_list, current_distance_list,
         print(len(time_list), len(conductivity_list), len(current_distance_list),
               len(flowrate_list), len(permeate_mass_list))
     
-    headers = (['Time (seconds)',  'Conductivity (mS)', 'Measured distance (cm)',
+    headers = (['Time (seconds)',  'Conductivity (mS/cm)', 'Measured distance (cm)',
                 'Flowrate (mL/min)', 'Permeate mass (g)'])
     
     for entry in range(len(conductivity_list)):
