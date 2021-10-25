@@ -93,8 +93,8 @@ def init():
 
 # CONSTANTS --------------------------------
 
-empty_tank_dist = 26  # cm, top of the tank to the top of the drainage square with some extra room 
-full_tank_dist = 22  # cm  (CHANGE LATER?)
+empty_tank_dist = 18  # cm, top of the tank to the top of the drainage square with some extra room 
+full_tank_dist = 17  # cm  (CHANGE LATER?)
 
 time_step = 0.50 # seconds (this is not actually the real time step between data points)
 num_average_elements = 1  # average last 1 distance values
@@ -109,6 +109,7 @@ distance_list = []
 current_distance_list = []
 conductivity_list = []
 flowrate_list = []
+stage_list = []
 raw_distance_list = [10,10,10,10] # arbitrary values to get the standard dev. thing to work
 
 # feed_conductivity = 10 # mS/cm
@@ -390,8 +391,8 @@ def volume_step_approximation(time_step, last_flowrate, current_flowrate):
     volume_step = ((last_flowrate + current_flowrate)/2) *(time_step/60)
     
     return volume_step
-    
-    
+
+
 # def check_salinity(conductivity_list):
 #     '''
 #     If conductivity of the feed water is equal to conductivity in the system
@@ -433,35 +434,34 @@ def data_formatting(time_list, conductivity_list, current_distance_list,
     # Makes sure that the lists are equal size
     
     if ((len(time_list) + len(conductivity_list) + len(current_distance_list)
-        + len(flowrate_list)+ len(permeate_mass_list))/5) != 1:
+        + len(flowrate_list)+ len(permeate_mass_list) + len(stage_list))/6) != 1:
                     
         if (len(time_list) < len(conductivity_list) and
-            len(time_list) < len(current_distance_list)):
+            len(time_list) < len(current_distance_list) < len(stage_list)):
             time_list.append(time_end)
                 
         if (len(permeate_mass_list) < len(conductivity_list) and
-            len(permeate_mass_list) < len(current_distance_list)): 
+            len(permeate_mass_list) < len(current_distance_list) < len(stage_list)): 
             scale_reading()
             
         if (len(conductivity_list) > len(current_distance_list) and
             len(conductivity_list) > len(flowrate_list) and
-            len(conductivity_list) > len(permeate_mass_list)):
+            len(conductivity_list) > len(permeate_mass_list) >len(stage_list)):
             conductivity_list.pop(-1)       
         
         print(len(time_list), len(conductivity_list), len(current_distance_list),
-              len(flowrate_list), len(permeate_mass_list))
+              len(flowrate_list), len(permeate_mass_list), len(stage_list))
     
     headers = (['Time (seconds)',  'Conductivity (mS/cm)', 'Measured distance (cm)',
-                'Flowrate (mL/min)', 'Permeate mass (g)'])
+                'Flowrate (mL/min)', 'Permeate mass (g)', 'Stage number'])
     
     for entry in range(len(conductivity_list)):
         rows.append([time_list[entry], conductivity_list[entry], current_distance_list[entry],
-                     current_flowrate_list[entry], permeate_mass_list[entry]])
+                     current_flowrate_list[entry], permeate_mass_list[entry], stage_list[entry]])
     
-    # WRITING TO A CSV FILE IN THE FOLDER "CSV_dara"
-
+    # WRITING TO A CSV FILE IN THE FOLDER "CSV_data"
+        
     date = datetime.today().strftime('%Y-%m-%d')    
-# 
 
     try:
         os.mkdir("./CSV_data")
@@ -491,6 +491,9 @@ def main():
         time_now = time.time() - beginning_time
         time_readings(time_now)
         scale_reading()
+        stage_number = 0
+        print("Stage Number = %.lf" % stage_number)
+        stage_list.append(stage_number)
 
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
@@ -519,6 +522,9 @@ def main():
                 scale_reading()
                 time_now = time.time() - beginning_time
                 time_readings(time_now)
+                stage_number = 1
+                print("Stage Number = %.lf" % stage_number)
+                stage_list.append(stage_number)
                 
                 added_volume = volume_step_approximation(time_step_flushing,
                                                          last_flowrate, current_flowrate)
@@ -548,6 +554,9 @@ def main():
                     time_now = time.time() - beginning_time
                     time_readings(time_now)
                     scale_reading()
+                    stage_number = 2
+                    print("Stage Number = %.lf" % stage_number)
+                    stage_list.append(stage_number)
  
                     tank_is_full = check_tank_full(average_distance)
                           
@@ -584,6 +593,7 @@ def main():
                     time_now = time.time() - beginning_time
                     time_readings(time_now)
                     scale_reading()
+                    stage_number = stages()
                 
                     GPIO.output(16,GPIO.HIGH) # relay is OFF, so Brine valve is closed
                     Brine_valve_open = 0
