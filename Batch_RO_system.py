@@ -93,8 +93,8 @@ def init():
 
 # CONSTANTS --------------------------------
 
-empty_tank_dist = 18  # cm, top of the tank to the top of the drainage square with some extra room 
-full_tank_dist = 17  # cm  (CHANGE LATER?)
+empty_tank_dist = 21  # cm, top of the tank to the top of the drainage square with some extra room 
+full_tank_dist = 18  # cm  (CHANGE LATER?)
 
 time_step = 0.50 # seconds (this is not actually the real time step between data points)
 num_average_elements = 1  # average last 1 distance values
@@ -109,7 +109,7 @@ distance_list = []
 current_distance_list = []
 conductivity_list = []
 flowrate_list = []
-stage_list = []
+stage_list = [1]
 raw_distance_list = [10,10,10,10] # arbitrary values to get the standard dev. thing to work
 
 # feed_conductivity = 10 # mS/cm
@@ -437,17 +437,22 @@ def data_formatting(time_list, conductivity_list, current_distance_list,
         + len(flowrate_list)+ len(permeate_mass_list) + len(stage_list))/6) != 1:
                     
         if (len(time_list) < len(conductivity_list) and
-            len(time_list) < len(current_distance_list) < len(stage_list)):
+            len(time_list) < len(current_distance_list)):
             time_list.append(time_end)
                 
         if (len(permeate_mass_list) < len(conductivity_list) and
-            len(permeate_mass_list) < len(current_distance_list) < len(stage_list)): 
+            len(permeate_mass_list) < len(current_distance_list)): 
             scale_reading()
             
         if (len(conductivity_list) > len(current_distance_list) and
             len(conductivity_list) > len(flowrate_list) and
-            len(conductivity_list) > len(permeate_mass_list) >len(stage_list)):
-            conductivity_list.pop(-1)       
+            len(conductivity_list) > len(permeate_mass_list)):
+            conductivity_list.pop(-1)
+            
+        if (len(stage_list) > len(conductivity_list) and
+            len(stage_list) > len(current_distance_list)):
+            stage_list.pop(-1)
+                
         
         print(len(time_list), len(conductivity_list), len(current_distance_list),
               len(flowrate_list), len(permeate_mass_list), len(stage_list))
@@ -491,9 +496,11 @@ def main():
         time_now = time.time() - beginning_time
         time_readings(time_now)
         scale_reading()
-        stage_number = 0
+        stage_number = 1 # draining
         print("Stage Number = %.lf" % stage_number)
         stage_list.append(stage_number)
+        # print(stage_list)
+
 
         tank_is_empty = check_tank_empty(average_distance)
         tank_is_full = check_tank_full(average_distance)
@@ -522,7 +529,7 @@ def main():
                 scale_reading()
                 time_now = time.time() - beginning_time
                 time_readings(time_now)
-                stage_number = 1
+                stage_number = 2 # flushing
                 print("Stage Number = %.lf" % stage_number)
                 stage_list.append(stage_number)
                 
@@ -554,7 +561,7 @@ def main():
                     time_now = time.time() - beginning_time
                     time_readings(time_now)
                     scale_reading()
-                    stage_number = 2
+                    stage_number = 3 # filling
                     print("Stage Number = %.lf" % stage_number)
                     stage_list.append(stage_number)
  
