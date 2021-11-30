@@ -1,5 +1,5 @@
 % reading data
-data = readtable('40_2021-08-05.csv'); % name of file being analyzed
+data = readtable('71_2021-10-17.csv'); % name of file being analyzed
 
 % converting table to an array
 A = table2array(data);
