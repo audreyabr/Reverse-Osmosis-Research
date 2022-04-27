@@ -1,8 +1,8 @@
 % entire system code
 clear all
 % setup pins 
-trigger_pin= 'D1';
-echo_pin = 'D2';
+trigger_pin= 'D8';
+echo_pin = 'D9';
 batch_valve_pin = 'D3';
 brine_valve_pin = 'D4';
 feed_valve_pin = 'D5';
@@ -12,33 +12,33 @@ conductivity_pin = 'A1';
 % Setup Arduino and Ultrasonic sensor
 
 a = arduino('COM8', 'Mega2560')
-ultrasonicObj = ultrasonic(a,triggerPin, echoPin, 'OutputFormat','double')
+ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double')
 
 % Setup Scale
-if ~isempty(instrfind)
-  fclose(instrfind);
-  delete(instrfind);
-end
-s = serial('COM7', 'baudrate', 9600) % scale
- set(s,'Parity', 'none');
- set(s,'DataBits', 8);
- set(s,'StopBit', 1);
-
- fopen(s)
+% % if ~isempty(instrfind)
+% %   fclose(instrfind);
+% %   delete(instrfind);
+% % end
+% % s = serial('COM7', 'baudrate', 9600) % scale
+% %  set(s,'Parity', 'none');
+% %  set(s,'DataBits', 8);
+% %  set(s,'StopBit', 1);
+% % 
+% %  fopen(s)
 
 % constants
 
 empty_tank_dist = 21  % cm, top of the tank to the top of the drainage square with some extra room 
 full_tank_dist = 18  % cm  (CHANGE LATER?)
 time_step = 0.50 % seconds (this is not actually the real time step between data points)
-took_scale_data = 0 % this helps with the scale data collecting
+% % took_scale_data = 0 % this helps with the scale data collecting
 flow_loop_volume = 150 % ml
 
 % empty lists 
 
 rows = []
 time_list = []
-mass_list = []
+% % mass_list = []
 distance_list = []
 current_distance_list = []
 conductivity_list = []
@@ -53,15 +53,15 @@ while run == 1
 
 % REGULAR DATA COLLECTION:
 conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
-[distance_list, distance] = distance_reading(arduino_object, distance_list, trigger_pin, echo_pin)    
-[flowrate_list, flowrate] = flowrate_reading(arduino_object, flowrate_list, flowrate_pin)  
-[mass_list,mass] = scale_reading(s, mass_list)
+[distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
+[flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
+% % [mass_list,mass] = scale_reading(s, mass_list)
 
 time_now = toc(t); 
 time_list = time_readings(time_list, time_now)
 
-tank_is_empty = check_tank_empty(empty_tank_distance, distance)
-tank_is_full = check_tank_full(full_tank_distance, distance)
+tank_is_empty = check_tank_empty(empty_tank_dist, distance)
+tank_is_full = check_tank_full(full_tank_dist, distance)
 disp("REGULAR OPERATION... DRAINING BATCH TANK") 
 pause(time_step)
 
@@ -73,27 +73,27 @@ if tank_is_empty == 1
     volume_flushed = 0 
     last_flowrate = 0 
     time_step_flushing = 1
-    print("TANK IS EMPTY")
+    disp("TANK IS EMPTY")
     
     while volume_flushed < flow_loop_volume && tank_is_full == 0
         time_then = tic()
         
         % DATA COLLECTION
         conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
-        [distance_list, distance] = distance_reading(a, distance_list, trigger_pin, echo_pin)    
+        [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
         [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-        [mass_list,mass] = scale_reading(s, mass_list)
+% %         [mass_list,mass] = scale_reading(s, mass_list)
         time_now = toc(t); 
         time_list = time_readings(time_list, time_now)
            
         added_volume = volume_step_approx(time_step_flushing, last_flowrate, current_flowrate)
-        volume_flushed = volume_flushed + added volume;
+        volume_flushed = volume_flushed + added_volume;
         disp("Volume flushed: " + volume_flushed + "ml")
-        last_flowrate == current flowrate;
+        last_flowrate == current_flowrate;
         
-        delay(time_step)
+        pause(time_step)
         
-        print("FLUSHING... WAITING TO FLUSH 150 ml FROM FLOW LOOP")
+        disp("FLUSHING... WAITING TO FLUSH 150 ml FROM FLOW LOOP")
         
         writeDigitalPin(a,batch_valve_pin,0); % batch valve is open
         Brine_valve_open = 1
@@ -103,18 +103,18 @@ if tank_is_empty == 1
         time_now = toc(time_then); 
         time_step_flushing == time_now - time_then; 
         
-        else 
+        %else 
             while volume_flushed >= 72
-                delay(time_step)
+                pause(time_step)
                 disp("FILLING BATCH TANK")
                  conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
-                [distance_list, distance] = distance_reading(a, distance_list, trigger_pin, echo_pin)    
+                [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
                 [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-                [mass_list,mass] = scale_reading(s, mass_list)
+% %                 [mass_list,mass] = scale_reading(s, mass_list)
                 time_now = toc(t); 
                 time_list = time_readings(time_list, time_now)
                 
-                tank_is_full = check_tank_full(full_tank_distance, distance)
+                tank_is_full = check_tank_full(full_tank_dist, distance)
                 
                 disp("Measured Distance = " + distance)
                 
@@ -132,7 +132,7 @@ end
 
 % if tank_is_full == 1
 %     writeDigitalPin(a,feed_valve_pin,1) % feed valve is closed 
-%     print("TANK IS FULL")
+%     disp("TANK IS FULL")
 %     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
 %     [distance_list, distance] = distance_reading(a, distance_list, trigger_pin, echo_pin)    
 %     [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
@@ -142,7 +142,7 @@ end
 % 
 %     if Brine_valve_open ==1
 %         disp("FLUSHING....WAITING 9 SECOND")
-%         delay(9)
+%         pause(9)
 %         conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
 %         [distance_list, distance] = distance_reading(a, distance_list, trigger_pin, echo_pin)    
 %         [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  

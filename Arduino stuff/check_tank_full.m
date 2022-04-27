@@ -10,6 +10,7 @@ function tank_is_full = check_tank_full(full_tank_distance, last_distance)
 tank_is_full = 0  
 if last_distance <= full_tank_distance
     tank_is_full = 1 
-    print("TANK IS FULL")
+    disp[distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
+("TANK IS FULL")
     
 end
