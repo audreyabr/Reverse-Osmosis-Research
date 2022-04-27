@@ -7,7 +7,6 @@ clear all
      fclose(instrfind);
       delete(instrfind);
     end
-    [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
 
 
 s = serial('COM7', 'baudrate', 9600)
@@ -16,10 +15,15 @@ s = serial('COM7', 'baudrate', 9600)
  set(s,'StopBit', 1);
  
 fopen(s)
-
+mass_list = []
 for i = 1:100
     a = fscanf(s);% 
-    disp(a)
+    b = strtrim(a);
+    c = erase(b,"g");
+    d = erase(c,"?");
+    e = strtrim(d);
+    f = str2double(e);
+    disp(f)
     pause(1)
 end
 

@@ -15,30 +15,30 @@ a = arduino('COM8', 'Mega2560')
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double')
 
 % Setup Scale
-% % if ~isempty(instrfind)
-% %   fclose(instrfind);
-% %   delete(instrfind);
-% % end
-% % s = serial('COM7', 'baudrate', 9600) % scale
-% %  set(s,'Parity', 'none');
-% %  set(s,'DataBits', 8);
-% %  set(s,'StopBit', 1);
-% % 
-% %  fopen(s)
+if ~isempty(instrfind)
+  fclose(instrfind);
+  delete(instrfind);
+end
+s = serial('COM7', 'baudrate', 9600) % scale
+ set(s,'Parity', 'none');
+ set(s,'DataBits', 8);
+ set(s,'StopBit', 1);
+
+ fopen(s)
 
 % constants
 
 empty_tank_dist = 21  % cm, top of the tank to the top of the drainage square with some extra room 
 full_tank_dist = 18  % cm  (CHANGE LATER?)
 time_step = 0.50 % seconds (this is not actually the real time step between data points)
-% % took_scale_data = 0 % this helps with the scale data collecting
+took_scale_data = 0 % this helps with the scale data collecting
 flow_loop_volume = 150 % ml
 
 % empty lists 
 
 rows = []
 time_list = []
-% % mass_list = []
+mass_list = []
 distance_list = []
 current_distance_list = []
 conductivity_list = []
@@ -55,7 +55,7 @@ while run == 1
 conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
 [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-% % [mass_list,mass] = scale_reading(s, mass_list)
+[mass_list, mass] = scale_reading(s, mass_list)
 
 time_now = toc(t); 
 time_list = time_readings(time_list, time_now)
@@ -84,7 +84,7 @@ if tank_is_empty == 1
         conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
         [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
         [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-% %     [mass_list,mass] = scale_reading(s, mass_list)
+        [mass_list,mass] = scale_reading(s, mass_list)
         time_now = toc(t); 
         time_list = time_readings(time_list, time_now)
            
@@ -115,7 +115,7 @@ if tank_is_empty == 1
             conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
             [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
             [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-% %         [mass_list,mass] = scale_reading(s, mass_list)
+            [mass_list,mass] = scale_reading(s, mass_list)
             time_now = toc(t); 
             time_list = time_readings(time_list, time_now)
                 
@@ -162,9 +162,4 @@ end
 %         
 %     end 
 
-end            
-        
-
-
-
-
+end   

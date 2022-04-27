@@ -7,7 +7,7 @@ function tank_is_empty = check_tank_empty(empty_tank_distance, last_distance)
 % Returns:
 %     tank_is_empty: 0 if the batch tank is not empty or 1 if the batch tank is emptu 
  
-tank_is_empty = 0  [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
+tank_is_empty = 0  
 
 if last_distance >= empty_tank_distance
     tank_is_empty = 1 

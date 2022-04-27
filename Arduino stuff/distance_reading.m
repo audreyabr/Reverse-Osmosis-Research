@@ -9,8 +9,7 @@ function [distance_list, distance]  = distance_reading(arduino_object, ultrasoni
 % Returns: distance_list - the list of distance readings (cm)
 
     %ultrasonicObj = ultrasonic(arduino_object, triggerPin, echoPin, 'OutputFormat','double')
-    distance = readDistance(ultrasonicObj) *100[distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
-
+    distance = readDistance(ultrasonicObj) *100
     distance_list(end+1, 1) = distance
     
 end

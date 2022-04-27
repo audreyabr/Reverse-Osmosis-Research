@@ -8,7 +8,12 @@ function [mass_list,mass] = scale_reading(serial_object, mass_list)
 
 % Returns: mass_list - the list of mass readings (g)
     
-    mass = fscanf(serial_object);
+    a = fscanf(serial_object);% 
+    b = strtrim(a);
+    c = erase(b,"g");
+    d = erase(c,"?");
+    e = strtrim(d);
+    mass = str2double(e);  
     mass_list(end+1, 1) = mass
     
 end
