@@ -76,13 +76,15 @@ if tank_is_empty == 1
     disp("TANK IS EMPTY")
     
     while volume_flushed < flow_loop_volume && tank_is_full == 0
+        %   Fill the tank and drain the brine until 72 ml has been flushed 
+
         time_then = tic()
         
         % DATA COLLECTION
         conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
         [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
         [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-% %         [mass_list,mass] = scale_reading(s, mass_list)
+% %     [mass_list,mass] = scale_reading(s, mass_list)
         time_now = toc(t); 
         time_list = time_readings(time_list, time_now)
            
@@ -103,30 +105,32 @@ if tank_is_empty == 1
         time_now = toc(time_then); 
         time_step_flushing == time_now - time_then; 
         
-        %else 
-            while volume_flushed >= 72
-                pause(time_step)
-                disp("FILLING BATCH TANK")
-                 conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
-                [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
-                [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
-% %                 [mass_list,mass] = scale_reading(s, mass_list)
-                time_now = toc(t); 
-                time_list = time_readings(time_list, time_now)
+    %else 
+        while volume_flushed >= 72
+            % After 9 seconds of draining, close Brine valve,
+            % open Batch valve and resume regular filling
+
+            pause(time_step)
+            disp("FILLING BATCH TANK")
+            conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin)
+            [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin)    
+            [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin)  
+% %         [mass_list,mass] = scale_reading(s, mass_list)
+            time_now = toc(t); 
+            time_list = time_readings(time_list, time_now)
                 
-                tank_is_full = check_tank_full(full_tank_dist, distance)
+            tank_is_full = check_tank_full(full_tank_dist, distance)
                 
-                disp("Measured Distance = " + distance)
+            disp("Measured Distance = " + distance)
                 
-                writeDigitalPin(a,brine_valve_pin,1) % Brine valve is closed 
-                Brine_valve_open = 0 
-                writeDigitalPin(a,batch_valve_pin,1) % Batch valve is open 
+            writeDigitalPin(a,brine_valve_pin,1) % Brine valve is closed 
+            Brine_valve_open = 0 
+            writeDigitalPin(a,batch_valve_pin,1) % Batch valve is open 
                 
-                if tank_is_full == 1
-                    break 
-                end 
-                
-            end
+            if tank_is_full == 1
+                 break 
+            end          
+        end
     end
 end
 
