@@ -9,7 +9,8 @@ function tank_is_full = check_tank_full(full_tank_distance, last_distance)
  
 tank_is_full = 0  
 if last_distance <= full_tank_distance
-    tank_is_full = 1 
+    tank_is_full = 1
+    tank_is_empty = 0 
     disp("TANK IS FULL")
     
 end

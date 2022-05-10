@@ -12,6 +12,7 @@ tank_is_empty = 0
 
 if last_distance >= empty_tank_distance
     tank_is_empty = 1 
+    tank_is_full = 0
     disp("TANK IS EMPTY")
     
 end
