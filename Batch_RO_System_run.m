@@ -27,7 +27,6 @@ s = serial('COM13', 'baudrate', 9600) % scale
  set(s,'StopBit', 1);
 
 fopen(s)
-count = 0 
 
 % constants
 empty_tank_dist = 25.5;  % cm, top of the tank to the top of the drainage square with some extra room
@@ -74,7 +73,7 @@ brine_valve_open = 0;
         last_flowrate = 0; 
         time_step_flushing = 1;
         disp("TANK IS EMPTY")
-        disp("Starting")
+        disp("New time is starting soon!")
         while volume_flushed < flow_loop_volume && tank_is_full == 0
             %   Fill the tank and drain the brine until 72 ml has been flushed 
             

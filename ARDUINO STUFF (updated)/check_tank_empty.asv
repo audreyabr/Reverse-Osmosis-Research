@@ -1,0 +1,30 @@
+function tank_state = check_tank_state(last_distance)
+
+% Checks if the batch tank is empty, full or neither
+%    
+% Args:
+%     last_distance: An integer representing the batch tank distance
+% Returns:
+%     tank_is_empty: 0 if the batch tank is not empty or 1 if the batch
+%     tank is empty
+empty_tank_distance = 25.5;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_distance = 23;  % cm  (CHANGE LATER?)
+if last_distance >= empty_tank_distance
+    tank_is_empty = 1;
+    disp("TANK IS EMPTY")
+elseif last_distance <= full_tank_distance
+    tank_is_
+function tank_is_full = check_tank_full(full_tank_distance, last_distance)
+ 
+% Checks if the batch tank is full. 
+%    
+% Args:
+%     last_distance: An integer representing the batch tank distance                             
+% Returns:
+%     tank_is_full: 0 if the batch tank is not full or 1 if the batch tank is full 
+ 
+if last_distance <= full_tank_distance
+    tank_is_full = 1;
+    disp("TANK IS FULL")
+    
+end
