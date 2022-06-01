@@ -29,6 +29,6 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
     % error = (0.0921*conductivity) + 0.6133
     % actual_conductivity = conductivity - error
     
-    conductivity_list(end+1, 1) = conductivity;
+    conductivity_list(end+1, 1) = conductivity
     
 end
