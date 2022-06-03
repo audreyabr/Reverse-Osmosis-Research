@@ -140,13 +140,14 @@ brine_valve_open = 0;
                     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
 
                     disp("Measured Distance = " + distance)
+                    writeDigitalPin(a,batch_valve_pin,1) % batch valve is open 
+                    % batch valve 0 is close and 1 is open
                     writeDigitalPin(a,brine_valve_pin,1) % brine valve is closed
                     % brine valve 0 is open 1 is close
                     % feed valve 0 is open 1 is close
                     Brine_valve_open = 0;
                     disp('THIS IS THE SPOT WHERE IT CRASHES')
-                    writeDigitalPin(a,batch_valve_pin,1) % batch valve is open 
-                    % batch valve 0 is close and 1 is open
+                    
 
                     if tank_state == 2
                         disp('BREAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK')
