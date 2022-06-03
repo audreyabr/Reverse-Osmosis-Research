@@ -26,9 +26,9 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
     % to convert Amp to miliamp)
     conductivity = ((2000 * voltage)/(16*0.001*R*K)) - ((4*2000)/(K*16));
     
-    % error = (1.2188 * conductivity) + 5;
+    error = (1.2188 *conductivity) + 0.6133;
     % actual_conductivity = conductivity - error
     
-    conductivity_list(end+1, 1:2) = [conductivity, voltage];
+    conductivity_list(end+1, 1) = conductivity;
     
 end
