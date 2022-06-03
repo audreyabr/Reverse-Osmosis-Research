@@ -11,8 +11,8 @@
 %% Find volumes of all other sections of the tank, with respect to overall height
 
 function res = Water_Tank_Calculations(overall_height)
-    % CHANGE THIS, h max is 11.25 inches
-    h_overall = overall_height; %11.25 - 6.5  % the overall height from the very bottom of the container, inches
+    % CHANGE THIS, h max is 11.75 inches
+    h_overall = overall_height; %11.75 - 6.5  % the overall height from the very bottom of the container, inches
 
     % find volume of rectangle portion at the top.
     if h_overall <= 4.5380  % this is the max heights of square + triangle
