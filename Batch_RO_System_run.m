@@ -10,6 +10,8 @@ brine_valve_pin = 'D3';
 feed_valve_pin = 'D5';
 flowrate_pin = 'A0';
 conductivity_pin = 'A1';
+perm_flowrate_pin = 'A2';
+pressure_transducer_pin = 'A3';
 
 % Setup Arduino and Ultrasonic sensor
 a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
@@ -46,6 +48,8 @@ distance_list = [];
 current_distance_list = [];
 conductivity_list = [];
 flowrate_list = [];
+perm_flowrate_list = [];
+pres_trans_list = [];
 
 % main code 
 run = 1;
@@ -57,6 +61,8 @@ while run == 1
 conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
 [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+[perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+[pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
 [mass_list, mass] = scale_reading(s, mass_list);
 
 % Read time
