@@ -10,6 +10,8 @@ brine_valve_pin = 'D3';
 feed_valve_pin = 'D5';
 flowrate_pin = 'A0';
 conductivity_pin = 'A1';
+perm_flowrate_pin = 'A2';
+pressure_transducer_pin = 'A3';
 
 
 % Setup Arduino and Ultrasonic sensor
@@ -56,9 +58,10 @@ while run == 1
     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
     [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+    [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
     [mass_list, mass] = scale_reading(s, mass_list);
-    [premeate_flowrate_list, premeate_flowrate] = permeate_flowrate_reading(a,perm_flowrate_list, perm_flowrate_pin);
-
+    
     % Read time
     time_now = toc(t); 
     time_list = time_readings(time_list, time_now);
@@ -84,7 +87,6 @@ while run == 1
     end
     
     % tank is empty: open feed valves
-    % close/open brine and batch valves based on amount concentrate flushed
     if tank_state == 0 
         disp("TANK IS EMPTY, OPEN FEED VALVE")
         
@@ -96,7 +98,7 @@ while run == 1
         time_step_flushing = 0; % sec
         volume_flushed = 0; % ml
             
-            % as long as tube concentrate is not fully flushed
+            % tube concentrate is not fully flushed: brine valve open
             if volume_flushed < flush_tube_volume 
             
                 % valves operation
@@ -113,7 +115,9 @@ while run == 1
                     % REGULAR DATA COLLECTION
                     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+                    [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+                    [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+                    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
                     [mass_list, mass] = scale_reading(s, mass_list);
 
                     % Append time (from first start run) to data list
@@ -135,8 +139,9 @@ while run == 1
                         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
                     end
                  end 
-             end
+            end
             
+            % tube concentrate fully flushed: brine valve closed
             if volume_flushed >= flush_tube_volume
                 % valves operation
                 writeDigitalPin(a,batch_valve_pin,1) % open batch valve
@@ -149,9 +154,11 @@ while run == 1
                     
                     % REGULAR DATA COLLECTION
                     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
-                    [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);    
-                    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
-                    [mass_list,mass] = scale_reading(s, mass_list);
+                    [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
+                    [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+                    [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+                    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
+                    [mass_list, mass] = scale_reading(s, mass_list);
 
                     % Append time (from first start run) to data list
                     time_now = toc(t); 
