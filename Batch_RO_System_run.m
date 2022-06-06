@@ -60,7 +60,7 @@ while run == 1
 % REGULAR DATA COLLECTION:
 conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-[flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+[flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
 [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
 [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
 [mass_list, mass] = scale_reading(s, mass_list);
@@ -95,7 +95,7 @@ brine_valve_open = 0;
             % DATA COLLECTION
             conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
             [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-            [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+            [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
             [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
             [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
             [mass_list, mass] = scale_reading(s, mass_list);
@@ -135,7 +135,7 @@ brine_valve_open = 0;
                     
                     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+                    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
                     [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
                     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
                     [mass_list, mass] = scale_reading(s, mass_list);

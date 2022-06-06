@@ -36,7 +36,7 @@ fopen(s)
 % distance constants are passed into check state functions, change the
 % values here instead of in the function
 
-empty_tank_dist = 25.5;  % cm, top of the tank to the top of the drainage square with some extra room
+empty_tank_dist = 20;  % cm, top of the tank to the top of the drainage square with some extra room
 full_tank_dist = 17.5;  % cm  (CHANGE LATER?)
 %time_step = 0.50; % seconds (this is not actually the real time step between data points)
 flow_loop_volume = 150; % ml, the total amount of water in one batch
@@ -48,6 +48,8 @@ mass_list = [];
 distance_list = [];
 conductivity_list = [];
 flowrate_list = [];
+perm_flowrate_list = [];
+pres_trans_list = [];
 
 % main code 
 run = 1;
@@ -57,8 +59,8 @@ while run == 1
     % REGULAR DATA COLLECTION
     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-    [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
-    [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+    [perm_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
     [mass_list, mass] = scale_reading(s, mass_list);
     
@@ -71,13 +73,13 @@ while run == 1
     disp("REGULAR OPERATION... DRAINING BATCH TANK") 
     pause(0.5)
     
-    % tank is full
+    % if tank is full
     if tank_state == 2 
         disp("TANK FULL")
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
     end
     
-    % tank is neither empty nor full: keep valves at default
+    % if tank is neither empty nor full: keep valves at default
     if tank_state == 1
         % valves operation
         writeDigitalPin(a,batch_valve_pin,1); % open batch valve
@@ -86,7 +88,7 @@ while run == 1
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve  
     end
     
-    % tank is empty: open feed valves
+    % if tank is empty: open feed valves
     if tank_state == 0 
         disp("TANK IS EMPTY, OPEN FEED VALVE")
         
@@ -115,8 +117,8 @@ while run == 1
                     % REGULAR DATA COLLECTION
                     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
-                    [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+                    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+                    [perm_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
                     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
                     [mass_list, mass] = scale_reading(s, mass_list);
 
@@ -155,11 +157,11 @@ while run == 1
                     % REGULAR DATA COLLECTION
                     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    [flowrate_list, flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
-                    [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
+                    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+                    [perm_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading(a, perm_flowrate_list, perm_flowrate_pin);
                     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
                     [mass_list, mass] = scale_reading(s, mass_list);
-
+                    
                     % Append time (from first start run) to data list
                     time_now = toc(t); 
                     time_list = time_readings(time_list, time_now);
