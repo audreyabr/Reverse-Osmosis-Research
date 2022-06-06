@@ -15,7 +15,7 @@ function [flowrate_list,flowrate] = flowrate_reading(arduino_object, flowrate_li
                                              % 63 is some multiplier to make it more correct
     %voltage_in = voltage_out * 1/(((3.3/1024)*5)*63)
     
-    flowrate = voltage *200;
+    flowrate = voltage * 20;
     flowrate_list(end+1, 1) = flowrate;
 
 end

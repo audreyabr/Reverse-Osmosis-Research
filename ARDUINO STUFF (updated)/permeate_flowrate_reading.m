@@ -11,6 +11,6 @@ function [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading(arduino
 
     perm_voltage = readVoltage(arduino_object,perm_flowrate_pin); % can only read from 0V to 5V
 
-    perm_flowrate = perm_voltage * 200; %need to figure out why this is 200
+    perm_flowrate = perm_voltage * 100; %need to figure out why this is 200
     perm_flowrate_list(end+1, 1) = perm_flowrate;
 end
