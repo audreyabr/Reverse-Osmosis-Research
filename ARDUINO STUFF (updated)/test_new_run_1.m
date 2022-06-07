@@ -35,20 +35,20 @@ fopen(s)
 % distance constants are passed into check state functions, change the
 % values here instead of in the function
 
-empty_tank_dist = 20;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 17.5;  % cm  (CHANGE LATER?)
+empty_tank_dist = 25.5;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_dist = 13;  % cm  (CHANGE LATER?)
 %time_step = 0.50; % seconds (this is not actually the real time step between data points)
 flow_loop_volume = 150; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
 
 % empty lists 
 time_list = [0];
-mass_list = [];
+mass_list = [0];
 distance_list = [];
 conductivity_list = [];
-flowrate_list = [];
+flowrate_list = [0];
 permeate_flowrate_list = [0];
-permeate_volume_list = [];
+permeate_volume_list = [0];
 pres_trans_list = [];
 
 % main code 
@@ -73,12 +73,10 @@ while run == 1
     
     % Check if full
     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
-    disp("REGULAR OPERATION... DRAINING BATCH TANK") 
     pause(0.5)
     
     % if tank is full
     if tank_state == 2 
-        disp("TANK FULL")
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
     end
     
@@ -93,7 +91,6 @@ while run == 1
     
     % if tank is empty: open feed valves
     if tank_state == 0 
-        disp("TANK IS EMPTY, OPEN FEED VALVE")
         
         % open feed valve
         writeDigitalPin(a,feed_valve_pin,0);

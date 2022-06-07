@@ -9,7 +9,12 @@ a = arduino('COM5', 'Mega2560'); %('COM8', 'Uno')
  
     pause(3)
     
-
+writeDigitalPin(a,brine_valve_pin,1);% relay is closed, so brine valve is close
+pause(2)
+writeDigitalPin(a,feed_valve_pin,1);% relay is closed, so feed valve is close
+pause(2)
+writeDigitalPin(a,batch_valve_pin,1); % relay is closed so batch valve is open
+   
 
 %for i = 1:5
 %flush
@@ -25,12 +30,9 @@ pause(5)
 % configurePin(a,'D3',"pullup")
 % b = readDigitalPin(a,brine_valve_pin);
 
-writeDigitalPin(a,feed_valve_pin,1);% relay is closed, so brine valve is close
-disp('hi')
+writeDigitalPin(a,brine_valve_pin,1);% relay is closed, so brine valve is close
 pause(2)
-writeDigitalPin(a,brine_valve_pin,1);% relay is closed, so feed valve is close
-disp('hello')
+writeDigitalPin(a,feed_valve_pin,1);% relay is closed, so feed valve is close
 pause(2)
-disp('yoyoy')
-% writeDigitalPin(a,batch_valve_pin,1); % relay is closed so batch valve is open
+writeDigitalPin(a,batch_valve_pin,1); % relay is closed so batch valve is open
 

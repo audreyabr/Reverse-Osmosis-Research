@@ -15,11 +15,11 @@ function tank_state = check_tank_state(empty_tank_distance,full_tank_distance,la
 
 if last_distance >= empty_tank_distance
     tank_state = 0;
-    disp("TANK IS EMPTY")
+    disp("TANK IS EMPTY...feed valve open")
     
 elseif last_distance <= full_tank_distance
     tank_state = 2;
-    disp("TANK IS FULL")
+    disp("TANK IS FULL...close feed valve ")
     
 else
     tank_state = 1;
