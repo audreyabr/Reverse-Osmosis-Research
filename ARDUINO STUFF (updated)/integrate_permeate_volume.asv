@@ -1,0 +1,6 @@
+function [permeate_volume_list, permeate_volume] = integrate_permeate_volume(time_list,permeate_flowrate_list)
+% This function displays the total volume of permeate(ml) by integrating 
+% the permeate volume in each time interval upto a given time
+time_list(end)-ti
+end
+
