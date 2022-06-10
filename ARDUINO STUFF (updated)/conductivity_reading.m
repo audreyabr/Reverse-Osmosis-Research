@@ -17,14 +17,12 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
     %          would be between 0 and 25 volts and can be measured by the
     %          arduino directly: 0.02 A (max A) * 1000 ohms  = 20 V
     K = 100; % K value specified by manufacturer
-    %R1 = 30000; % voltmeter resistor 1 
-    %R2 = 7500; % voltmeter resistor 2
+    R1 = 30000; % voltmeter resistor 1 
+    R2 = 7500; % voltmeter resistor 2
     
     voltage = readVoltage(arduino_object,cond_pin); % voltage read from voltmeter
-    
-    % calculate conductivity with the formula in the manual (0.001 here is
-    % to convert Amp to miliamp)
-    conductivity = ((2000 * voltage)/(16*0.001*R*K)) - ((4*2000)/(K*16));
+    vIN = voltage / (R2/(R1+R2)); % actual voltage read over Resistor R from conductivity sensor
+    conductivity = ((2000 * vIN)/(16*0.001*R*K)) - ((4*2000)/(K*16))% display conductivity
     
     % error = (1.2188 * conductivity) + 5;
     % actual_conductivity = conductivity - error

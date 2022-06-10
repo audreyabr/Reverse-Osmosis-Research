@@ -17,7 +17,7 @@ pressure_transducer_pin = 'A3';
 a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
-% Setup Scale
+% Setup Scale (optional since now permeate flowmeter is working!)
 if ~isempty(instrfind)
   fclose(instrfind);
   delete(instrfind);
@@ -32,12 +32,9 @@ fopen(s)
 
 % constants
 
-% distance constants are passed into check state functions, change the
-% values here instead of in the function
-
 empty_tank_dist = 25.5;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 13;  % cm  (CHANGE LATER?)
-%time_step = 0.50; % seconds (this is not actually the real time step between data points)
+full_tank_dist = 13.3;  % cm  (CHANGE LATER?)
+pause_time = 0.50; % seconds, waiting time between arduino operations
 flow_loop_volume = 150; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
 
@@ -73,20 +70,22 @@ while run == 1
     
     % Check if full
     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
-    pause(0.5)
     
     % if tank is full
     if tank_state == 2 
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
+        pause(pause_time) % valve delay time
     end
     
     % if tank is neither empty nor full: keep valves at default
     if tank_state == 1
         % valves operation
         writeDigitalPin(a,batch_valve_pin,1); % open batch valve
-        pause(0.5) % valve delay time
+        pause(pause_time) % valve delay time
         writeDigitalPin(a,brine_valve_pin,1);% close brine valve
-        writeDigitalPin(a,feed_valve_pin,1);% close feed valve  
+        pause(pause_time) % valve delay time
+        writeDigitalPin(a,feed_valve_pin,1);% close feed valve
+        pause(pause_time) % valve delay time
     end
     
     % if tank is empty: open feed valves
@@ -94,6 +93,7 @@ while run == 1
         
         % open feed valve
         writeDigitalPin(a,feed_valve_pin,0);
+        pause(pause_time) % valve delay time
         
         % initialize
         last_flowrate = 0; % ml/min
@@ -105,9 +105,9 @@ while run == 1
             
                 % valves operation
                 writeDigitalPin(a,brine_valve_pin,0);  % open brine valve
-                pause(0.5)
+                pause(pause_time) % valve delay time
                 writeDigitalPin(a,batch_valve_pin,0); % close batch valve
-                
+                pause(pause_time) % valve delay time
                 disp("start flushing..OPENED BRINE, CLOSED BATCH")
                 
                 while volume_flushed < flush_tube_volume 
@@ -142,6 +142,7 @@ while run == 1
                     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
                     if tank_state == 2
                         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
+                        pause(pause_time) % valve delay time
                     end
                  end 
             end
@@ -150,8 +151,9 @@ while run == 1
             if volume_flushed >= flush_tube_volume
                 % valves operation
                 writeDigitalPin(a,batch_valve_pin,1) % open batch valve
-                pause(0.5)
+                pause(pause_time) % valve delay time
                 writeDigitalPin(a,brine_valve_pin,1) % close brine valve
+                pause(pause_time) % valve delay time
 
                 disp("Flushed" + flush_tube_volume + "..CLOSED BRINE, OPENED BATCH")
         
@@ -177,6 +179,7 @@ while run == 1
                     if tank_state == 2
                         disp("TANK FULL")
                         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
+                        pause(pause_time) % valve delay time
                         break
                     end
                 end    

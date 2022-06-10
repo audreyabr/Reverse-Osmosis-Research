@@ -11,7 +11,7 @@ function [pres_trans_list, pres_trans_value] = pres_trans_reading(arduino_object
 
     pres_trans_volts = readVoltage(arduino_object, pressure_transducer_pin); % can only read from 0V to 5V
     
-    pres_trans_value = 3*pres_trans_volts
-    pres_trans_list(end+1,1)=pres_trans_value
+    pres_trans_value = 3 * pres_trans_volts;
+    pres_trans_list(end+1,1 )= pres_trans_value;
 
 end
