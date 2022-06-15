@@ -11,38 +11,38 @@
 %% Find volumes of all other sections of the tank, with respect to overall height
 
 function res = Water_Tank_Calculations(overall_height)
-    % CHANGE THIS, h max is 11.75 inches
+    % CHANGE THIS, h max is 11.75 inches (29.845 cm)
     h_overall = overall_height; %11.75 - 6.5  % the overall height from the very bottom of the container, inches
 
     % find volume of rectangle portion at the top.
-    if h_overall <= 4.5380  % this is the max heights of square + triangle
+    if h_overall <= 11.52652  % this is the max heights of square + triangle in cm (4.5380 in)
         h_rectangle = 0;
     else
-        h_rectangle = h_overall - 4.5380;
+        h_rectangle = h_overall - 11.52652;
     end
 
 
     % find volume of square portion at the bottom. h_square found with the
     % inside corner length in the Solidworks.
-    if h_overall <= 0.6490
+    if h_overall <= 1.64846 % 0.6490 in
         h_square = h_overall;
     else
-        h_square = 0.6490;
+        h_square = 1.64846;
     end
 
 
     % find volume of triangle portion at the bottom.
-    if h_overall <= 0.6490
+    if h_overall <= 1.64846
         h_triangle = 0;
-    elseif h_overall <= 4.5380
-        h_triangle = h_overall - 0.6490;
+    elseif h_overall <= 11.52652
+        h_triangle = h_overall - 1.64846;
     else
-        h_triangle = 3.889;
+        h_triangle = 9.87806; % 3.889 in
     end
 
     V_triangle = V_trian(h_triangle);
 
-    res = h_square*2*2 + V_triangle + h_rectangle*11.75*6.75;% + 7*overall_height;
+    res = h_square*2*2 + V_triangle + h_rectangle*29.845*17.145;% + 7*overall_height;
 end
 
 %% change this to find Volume of the triangular portion, based on height
