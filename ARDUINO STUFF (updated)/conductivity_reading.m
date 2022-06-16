@@ -7,7 +7,7 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
 % Arduino and the Gnd wire plugging into Gnd on the Arduino.
 
 % Args: 
-%       conductivity_list: an array of conductivity readings (micro Siemens)
+%       conductivity_list: an array of conductivity readings (mS)
 %       arduino_object: the specific arduino we're using 
 
 % Returns: 
@@ -22,7 +22,7 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
     
     voltage = readVoltage(arduino_object,cond_pin); % voltage read from voltmeter
     vIN = voltage / (R2/(R1+R2)); % actual voltage read over Resistor R from conductivity sensor
-    conductivity = ((2000 * vIN)/(16*0.001*R*K)) - ((4*2000)/(K*16))% display conductivity
+    conductivity = ((2000 * vIN)/(16*0.001*R*K)) - ((4*2000)/(K*16));% display conductivity
     
     % error = (1.2188 * conductivity) + 5;
     % actual_conductivity = conductivity - error

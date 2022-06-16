@@ -32,10 +32,10 @@ fopen(s)
 
 % constants
 
-empty_tank_dist = 25.5;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 13.3;  % cm  (CHANGE LATER?)
-pause_time = 0.50; % seconds, waiting time between arduino operations
-flow_loop_volume = 150; % ml, the total amount of water in one batch
+empty_tank_dist = 14;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_dist = 10 ;  % cm  (CHANGE LATER?)
+pause_time = 2; % seconds, waiting time between arduino operations
+%flow_loop_volume = 120; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
 
 % empty lists 
@@ -47,12 +47,19 @@ flowrate_list = [0];
 permeate_flowrate_list = [0];
 permeate_volume_list = [0];
 pres_trans_list = [];
+flushed_volume_list = [];
 
 % main code 
+times_feed = 0;
 run = 1;
 t = tic();
 
+% Calculating starting volume
+[distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
+
+
 while run == 1
+    
     % REGULAR DATA COLLECTION
     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
@@ -73,12 +80,20 @@ while run == 1
     
     % if tank is full
     if tank_state == 2 
+        
+        % reset the time that empty state is achieved
+        times_feed = 0;
+        
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
         pause(pause_time) % valve delay time
     end
     
     % if tank is neither empty nor full: keep valves at default
     if tank_state == 1
+        
+        % reset the time that empty state is achieved
+        times_feed = 0;
+        
         % valves operation
         writeDigitalPin(a,batch_valve_pin,1); % open batch valve
         pause(pause_time) % valve delay time
@@ -88,8 +103,18 @@ while run == 1
         pause(pause_time) % valve delay time
     end
     
-    % if tank is empty: open feed valves
-    if tank_state == 0 
+    % if tank is empty: open feed valve
+    if tank_state == 0
+        
+         % record times entering this "empty if loop" continuously
+        times_feed = times_feed + 1;
+        if times_feed > 1
+            run = 0;
+        end 
+        % tank is empty again, bucket out of water, break the whole loop
+        if run == 0
+            break
+        end
         
         % open feed valve
         writeDigitalPin(a,feed_valve_pin,0);
@@ -110,7 +135,7 @@ while run == 1
                 pause(pause_time) % valve delay time
                 disp("start flushing..OPENED BRINE, CLOSED BATCH")
                 
-                while volume_flushed < flush_tube_volume 
+                while volume_flushed < flush_tube_volume && tank_state ~= 2
                     % start flushing timer
                     start_flushing = tic();
 
@@ -143,6 +168,14 @@ while run == 1
                     if tank_state == 2
                         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
                         pause(pause_time) % valve delay time
+                        break
+                    end
+                    if volume_flushed >= flush_tube_volume
+                        % valves operation
+                        writeDigitalPin(a,batch_valve_pin,1) % open batch valve
+                        pause(pause_time) % valve delay time
+                        writeDigitalPin(a,brine_valve_pin,1) % close brine valve
+                        pause(pause_time) % valve delay time
                     end
                  end 
             end
@@ -154,11 +187,14 @@ while run == 1
                 pause(pause_time) % valve delay time
                 writeDigitalPin(a,brine_valve_pin,1) % close brine valve
                 pause(pause_time) % valve delay time
-
-                disp("Flushed" + flush_tube_volume + "..CLOSED BRINE, OPENED BATCH")
+                
+                % append flushed volume to a list
+                flushed_volume_list(end+1,1) = volume_flushed; 
+                
+                disp("Flush volume achieved " + flush_tube_volume + "..CLOSED BRINE, OPENED BATCH")
         
                 while volume_flushed < flow_loop_volume
-                    
+
                     % REGULAR DATA COLLECTION
                     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
