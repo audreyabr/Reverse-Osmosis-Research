@@ -12,8 +12,9 @@ conductivity_pin = 'A1';
 perm_flowrate_pin = 'A2';
 pressure_transducer_pin = 'A3';
 
+
 % Setup Arduino and Ultrasonic sensor
-a = arduino('COM4', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM18', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % Setup Scale (optional since now permeate flowmeter is working!)
@@ -22,17 +23,22 @@ if ~isempty(instrfind)
   delete(instrfind);
 end
 
-s = serial('COM6', 'baudrate', 9600); % scale
+disp("end of sect 1")
+%%
+s = serial('COM17', 'baudrate', 9600); % scale
  set(s,'Parity', 'none');
  set(s,'DataBits', 8);
  set(s,'StopBit', 1);
 
 fopen(s)
+disp("end of sect 2")
+
+%%
 
 % constants
 
 empty_tank_dist = 14;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 10 ;  % cm  (CHANGE LATER?)
+full_tank_dist = 9.5;%8.4 ;  % cm  (CHANGE LATER?) %%% WAS TEN BEFORE
 pause_time = 2; % seconds, waiting time between arduino operations
 %flow_loop_volume = 120; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
@@ -57,6 +63,9 @@ t = tic();
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
 batch_tank_volume = Water_Tank_Calculations(29.845-distance);
 
+
+disp("end of section 3")
+%%
 while run == 1
     
     % REGULAR DATA COLLECTION
@@ -67,6 +76,7 @@ while run == 1
     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
     [mass_list, mass] = scale_reading(s, mass_list);
     
+    disp("regular data collection")
     % Read time
     time_now = toc(t); 
     time_list = time_readings(time_list, time_now);
@@ -76,10 +86,12 @@ while run == 1
     
     % Check if full
     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
+    disp("check if tank is full complete")
+
 
     % if tank is full
     if tank_state == 2 
-        
+        disp("tank state is full")
         % reset the time that empty state is achieved
         times_feed = 0;
         
@@ -89,6 +101,7 @@ while run == 1
 
     % if tank is neither empty nor full: keep valves at default
     if tank_state == 1
+        disp("tank state is neither empty nor full")
         
         % reset the time that empty state is achieved
         times_feed = 0;
@@ -101,5 +114,5 @@ while run == 1
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
         pause(pause_time) % valve delay time
     end
-  
+  disp("end point within loop")
 end

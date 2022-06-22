@@ -14,7 +14,7 @@ pressure_transducer_pin = 'A3';
 
 
 % Setup Arduino and Ultrasonic sensor
-a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM18', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % Setup Scale (optional since now permeate flowmeter is working!)
@@ -23,7 +23,7 @@ if ~isempty(instrfind)
   delete(instrfind);
 end
 
-s = serial('COM13', 'baudrate', 9600); % scale
+s = serial('COM17', 'baudrate', 9600); % scale
  set(s,'Parity', 'none');
  set(s,'DataBits', 8);
  set(s,'StopBit', 1);
@@ -33,7 +33,7 @@ fopen(s)
 % constants
 
 empty_tank_dist = 14;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 10 ;  % cm  (CHANGE LATER?)
+full_tank_dist = 9.5 ;  % cm  (CHANGE LATER?)
 pause_time = 2; % seconds, waiting time between arduino operations
 %flow_loop_volume = 120; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
