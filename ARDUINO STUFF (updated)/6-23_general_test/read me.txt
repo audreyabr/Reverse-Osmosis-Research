@@ -1,0 +1,2 @@
+in this run, the distance measurement method was changed to take 
+5 measurements every time and output the average of those 5
