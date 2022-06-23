@@ -1,28 +1,27 @@
 
-
 % assigning variables
-time = time_list(1:848,:);         % time, seconds
-conductivity = conductivity_list(:,1); % conductivity, mS/cm
-distance = distance_list(1:848,:);     % distance, cm
-batch_flow_rate = flowrate_list(1:848,:);    % flow rate, mL/min
-permeate_flow_rate = permeate_flowrate_list(1:848,:);
-mass = mass_list(1:848,:);         % mass, g
+time = time_list(1:848,:);                              % time, seconds
+conductivity = conductivity_list(:,1);                  % conductivity, mS/cm
+distance = distance_list(1:848,:);                      % distance, cm
+batch_flow_rate = flowrate_list(1:848,:);               % flow rate, mL/min
+permeate_flow_rate = permeate_flowrate_list(1:848,:);   % flow rate, mL/min
+mass = mass_list(1:848,:);                              % mass, g
 
 % calculates and plots salinity ,flux, and permeability
 % parameters to enter each time
-sal_pct_i = 0.03; % initial salinity (in %) for salinity-based estimation of recovery
-P_psi = 350; % applied pressure in psi
-permeate_cond = 0.188; % 
+sal_pct_i = 0.03;       % initial salinity (in %) for salinity-based estimation of recovery
+P_psi = 300;            % applied pressure in psi
+permeate_cond = 0.304;  % conductivity of permeate in mS/cm 
 
-% % preset parameters
-t_min_av = 0.5; % minutes to average over
-cond_at_1pct = 17.6; % conductivity in mS/cm for 1% NaCl
-pi_at_1pct = 7.9566; % osmotic pressure in bar for 1% NaCl
-t_interval = 1; % s NOTE: data time interval is approximate
+% preset parameters
+t_min_av = 0.5;         % minutes to average over
+cond_at_1pct = 17.6;    % conductivity in mS/cm for 1% NaCl
+pi_at_1pct = 7.9566;    % osmotic pressure in bar for 1% NaCl
+t_interval = 1;         % s NOTE: data time interval is approximate
 
 close all
-sal_pct = conductivity / cond_at_1pct; % salinity in % by wt (where linear!)
-n_av = t_min_av * 60/t_interval; % number of points to make flux avg across
+sal_pct = conductivity / cond_at_1pct;  % salinity in % by wt (where linear!)
+n_av = t_min_av * 60/t_interval;        % number of points to make flux avg across
 
 sal_pct_av = movmean(sal_pct, n_av);
 flowrate_av = (mass(n_av+1:end) - mass(1:end-n_av)) ./ (time(n_av+1:end) - time(1:end-n_av));
@@ -109,3 +108,11 @@ title("Membrane Permeability Over Time")
 xlabel('Time (s)')
 ylabel('Permeability (LMH/bar)')
 ylim([0,10])
+
+% plots osmotic pressure
+figure
+plot(time,pi_bar,'o')
+title("Osmotic Pressure Over Time")
+xlabel('Time (s)')
+ylabel('Osmotic pressure (bar)')
+
