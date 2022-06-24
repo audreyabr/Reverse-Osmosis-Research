@@ -29,7 +29,7 @@ void setup() {
 void loop() {
   Serial.println("loop start");
 
-  while (distance <9.5) {
+  while (distance <22) {
     // put your main code here, to run repeatedly:
     digitalWrite(brine_valve_pin, LOW);
     delay(1000);

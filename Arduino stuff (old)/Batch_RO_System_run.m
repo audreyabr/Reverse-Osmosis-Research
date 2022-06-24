@@ -19,17 +19,17 @@ if ~isempty(instrfind)
   fclose(instrfind);
   delete(instrfind);
 end
-s = serial('COM7', 'baudrate', 9600) % scale
+s = serial('COM6', 'baudrate', 9600) % scale
  set(s,'Parity', 'none');
 
  fopen(s)
 
 % constants
 
-empty_tank_dist = 21  % cm, top of the tank to the top of t
+empty_tank_dist = 12  % cm, top of the tank to the top of t
  set(s,'DataBits', 8);
- set(s,'StopBit', 1);he drainage square with some extra room 
-full_tank_dist = 18  % cm  (CHANGE LATER?)
+ set(s,'StopBit', 1); % the drainage square with some extra room 
+full_tank_dist = 10  % cm  (CHANGE LATER?)
 time_step = 0.50 % seconds (this is not actually the real time step between data points)
 took_scale_data = 0 % this helps with the scale data collecting
 flow_loop_volume = 150 % ml
