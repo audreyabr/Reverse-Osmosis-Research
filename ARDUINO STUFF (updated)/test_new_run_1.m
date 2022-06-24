@@ -1,6 +1,8 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
+filename = 'test.csv';
+
 % setup pins 
 trigger_pin= 'D8';
 echo_pin = 'D9';
@@ -14,7 +16,7 @@ pressure_transducer_pin = 'A3';
 
 
 % Setup Arduino and Ultrasonic sensor
-a = arduino('COM4', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM18', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % Setup Scale (optional since now permeate flowmeter is working!)
@@ -23,19 +25,19 @@ if ~isempty(instrfind)
   delete(instrfind);
 end
 
-s = serial('COM6', 'baudrate', 9600); % scale
+s = serial('COM17', 'baudrate', 9600); % scale
  set(s,'Parity', 'none');
  set(s,'DataBits', 8);
  set(s,'StopBit', 1);
 
 fopen(s)
-
+%% 
 % constants
 
 empty_tank_dist = 25;  % cm, top of the tank to the top of the drainage square with some extra room
 full_tank_dist = 22.5 ;  % cm  (CHANGE LATER?)
 pause_time = 2; % seconds, waiting time between arduino operations
-%flow_loop_volume = 120; % ml, the total amount of water in one batch
+flow_loop_volume = 120; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
 
 % empty lists 
@@ -57,9 +59,10 @@ t = tic();
 % Calculating starting volume
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
 
-
+%%
 while run == 1
-    
+%     save(filename,'permeate_volume_list','mass_list','-ascii');
+
     % REGULAR DATA COLLECTION
     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
