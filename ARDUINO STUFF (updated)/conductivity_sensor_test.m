@@ -1,6 +1,6 @@
  clear
 %  a = arduino ('COM18', 'Mega2560');
- a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
+ a = arduino('COM18', 'Mega2560','Libraries', 'Ultrasonic');
 
  cond_pin = 'A1';
  trigger_pin= 'D8';
@@ -16,6 +16,6 @@ for loop = 1:600
     conductivity_list = conductivity_reading(a,conductivity_list,cond_pin);
 	scatter(loop, conductivity_list(end,1))% live plotting
 	hold on 
-	pause(0.5)
+% 	pause(0.5)
 end 
 

@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-filename = 'test.csv';
+filename = 'live_data.txt';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -61,14 +61,15 @@ t = tic();
 
 %%
 while run == 1
-%     save(filename,'permeate_volume_list','mass_list','-ascii');
+    tobesaved = [distance_list,conductivity_list,permeate_flowrate_list,flowrate_list]; 
+    save(filename,"tobesaved",'-ascii','-tabs');
 
     % REGULAR DATA COLLECTION
     conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
     [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
     [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading(a, permeate_flowrate_list, perm_flowrate_pin);
-    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
+    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin); %%% are we using this? seems not
     [mass_list, mass] = scale_reading(s, mass_list);
     
     % Read time
