@@ -1,6 +1,6 @@
  clear
 %  a = arduino ('COM18', 'Mega2560');
- a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
+ a = arduino('COM4', 'Mega2560','Libraries', 'Ultrasonic');
 
  cond_pin = 'A1';
  trigger_pin= 'D8';
