@@ -30,8 +30,8 @@ s = serial('COM6', 'baudrate', 9600) % scale
 count = 0 
 % constants
 
-empty_tank_dist = 25.5  % cm, top of the tank to the top of the drainage square with some extra room 
-full_tank_dist = 23  % cm  (CHANGE LATER?)
+empty_tank_dist = 12.7  % cm, top of the tank to the top of the drainage square with some extra room 
+full_tank_dist = 10  % cm  (CHANGE LATER?)
 time_step = 0.50 % seconds (this is not actually the real time step between data points)
 %took_scale_data = 0 % this helps with the scale data collecting
 flow_loop_volume = 150 % ml
