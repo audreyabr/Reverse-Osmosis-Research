@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-%filename = 'live_data.txt';
+filename = 'live_data.txt';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -14,11 +14,20 @@ perm_flowrate_pin = 'A2';
 conductivity_pin_pos = 'A3';
 conductivity_pin_neg = 'A4';
 
-% Setup Arduino and Ultrasonic sensor
-a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
-ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
-
 % declare pin mode
+a.pinMode(8,"OUTPUT");
+a.pinMode(9,"OUTPUT");
+a.pinMode(4,"OUTPUT");
+a.pinMode(3,"OUTPUT");
+a.pinMode(5,"OUTPUT");
+a.pinMode(A0,"INPUT");
+a.pinMode(A2,"INPUT");
+a.pinMode(A3,"INPUT");
+a.pinMode(A4,"INPUT");
+
+% Setup Arduino and Ultrasonic sensor
+a = arduino('COM18', 'Mega2560','Libraries', 'Ultrasonic');
+ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % Setup Scale (optional since now permeate flowmeter is working!)
 if ~isempty(instrfind)
@@ -26,7 +35,7 @@ if ~isempty(instrfind)
   delete(instrfind);
 end
 
-s = serial('COM13', 'baudrate', 9600); % scale
+s = serial('COM17', 'baudrate', 9600); % scale
  set(s,'Parity', 'none');
  set(s,'DataBits', 8);
  set(s,'StopBit', 1);
@@ -59,14 +68,15 @@ t = tic();
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
 %%
 while run == 1
-    %tobesaved = [distance_list,conductivity_list,permeate_flowrate_list,flowrate_list]; 
-    %save(filename,"tobesaved",'-ascii','-tabs');
+    tobesaved = [distance_list,conductivity_list,permeate_flowrate_list,flowrate_list]; 
+    save(filename,"tobesaved",'-ascii','-tabs');
 
     % REGULAR DATA COLLECTION
-    conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin_pos, conductivity_pin_neg);
+    conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin_pos, conductivity_pin_pos,);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
     [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
     [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading(a, permeate_flowrate_list, perm_flowrate_pin);
+    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin); %%% are we using this? seems not
     [mass_list, mass] = scale_reading(s, mass_list);
     
     % Read time
@@ -117,10 +127,11 @@ while run == 1
                     start_flushing = tic();
 
                     % REGULAR DATA COLLECTION
-                    conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin_pos, conductivity_pin_neg);
+                    conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
                     [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
                     [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading(a, permeate_flowrate_list, perm_flowrate_pin);
+                    [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
                     [mass_list, mass] = scale_reading(s, mass_list);
                 
                     % Append time (from first start run) to data list
@@ -156,7 +167,7 @@ while run == 1
                 writeDigitalPin(a,batch_valve_pin,1) % open batch valve
                 pause(pause_time) % valve delay time
                 writeDigitalPin(a,brine_valve_pin,1) % close brine valve
-                pause(5) % valve delay time
+                pause(pause_time) % valve delay time
 
                 disp("Flush volume achieved " + flush_tube_volume + "..CLOSED BRINE, OPENED BATCH")
             end
