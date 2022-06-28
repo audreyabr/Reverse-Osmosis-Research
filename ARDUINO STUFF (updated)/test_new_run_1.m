@@ -156,7 +156,7 @@ while run == 1
                 writeDigitalPin(a,batch_valve_pin,1) % open batch valve
                 pause(pause_time) % valve delay time
                 writeDigitalPin(a,brine_valve_pin,1) % close brine valve
-                pause(5) % valve delay time
+                pause() % valve delay time
 
                 disp("Flush volume achieved " + flush_tube_volume + "..CLOSED BRINE, OPENED BATCH")
             end
