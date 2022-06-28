@@ -9,8 +9,8 @@ function [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading_daq(daq
 % Returns: perm_flowrate_list = the list of permeate flowrate readings 
 %          perm_flowrate = the current permeate flowrate reading  
 
-    perm_voltage = read(daqName, "OutputFormat", "Matrix");
+    voltage = read(daqName, "OutputFormat", "Matrix");
 
-    perm_flowrate = perm_voltage(1) * 20; % 20 calculated by max flow rate(100ml/min) / 5v 
+    perm_flowrate = voltage(1) * 20; % 20 calculated by max flow rate(100ml/min) / 5v 
     perm_flowrate_list(end+1, 1) = perm_flowrate;
 end

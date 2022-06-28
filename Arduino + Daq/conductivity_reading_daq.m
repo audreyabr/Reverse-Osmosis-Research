@@ -1,8 +1,8 @@
-function conductivity_list = conductivity_reading(arduino_object, conductivity_list, cond_pin_pos, cond_pin_neg)
+function conductivity_list = conductivity_reading_daq(daqName, conductivity_list)
 
 % Takes in the current conductivity list, takes the next
 % conductivity reading and appends it onto the list
-% 
+
 
 % Args: 
 %       conductivity_list: an array of conductivity readings (mS)
@@ -16,19 +16,13 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
 %       conductivity_list: the list of conductivity readings over time
 
     R = 200; % resistance in ohms - 
-    % this value is chosen so that cond_pin_neg voltage input is between 1V
+    % this value is chosen so that cond_pin_neg voltage is between 1V
     % and 4.2V
     
-    Vin = readVoltage(arduino_object,cond_pin_pos);
-    Vout = readVoltage(arduino_object,cond_pin_neg);
-    VR = Vin - Vout;
-    I = VR / R;
+    voltage = read(daqName, "OutputFormat", "Matrix");
+    I = voltage(3) / R; % I in A
     K = 100;
-    conductivity = (2000* (I*1000 - 4)) / 
-    
-    
-    
-
+    conductivity = (2000* (I * 1000 - 4)) / (16 * K); % I in mA
 
     % note that the code below has been modified to remove outliers from
     % the data using the matlab function remoutliers
@@ -56,6 +50,6 @@ function conductivity_list = conductivity_reading(arduino_object, conductivity_l
     % actual_conductivity = conductivity - error
     
     
-    conductivity_list(end+1, 1:2) = [conductivity, voltage];
+    conductivity_list(end+1, 1:2) = [conductivity, voltage(3)];
     
 end

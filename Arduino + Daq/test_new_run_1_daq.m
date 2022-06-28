@@ -9,10 +9,10 @@ echo_pin = 'D9';
 batch_valve_pin = 'D4';
 brine_valve_pin = 'D3';
 feed_valve_pin = 'D5';
-flowrate_pin = 'A0';
+% flowrate_pin = 'A0';
+% conductivity_pin = 'A1';
 % perm_flowrate_pin = 'A2';
-conductivity_pin_pos = 'A3';
-conductivity_pin_neg = 'A4';
+pressure_transducer_pin = 'A3';
 
 % Setup Arduino and Ultrasonic sensor
 a = arduino('COM4', 'Mega2560','Libraries', 'Ultrasonic');
@@ -24,10 +24,12 @@ d = daqlist;
 dq = daq('ni');
 Daqtype = d.DeviceID;
 
-ch00ai = addinput(dq,Daqtype,'ai0','Voltage');  %permeate flowrate in Channel AI0(+)
+ch00ai = addinput(dq,Daqtype,'ai0','Voltage');  % permeate flowrate in Channel AI0(+)
 ch00ai.TerminalConfig = 'SingleEnded';
-
-% declare pin mode
+ch01ai = addinput(dq,Daqtype,'ai1','Voltage');  % batch flowrate in Channel AI1(+)
+ch01ai.TerminalConfig = 'SingleEnded';
+ch02ai = addinput(dq,Daqtype,'ai2','Voltage');  % conductivity in Channel AI2
+ch02ai.TerminalConfig = 'Differential';
 
 % Setup Scale (optional since now permeate flowmeter is working!)
 if ~isempty(instrfind)
@@ -35,7 +37,7 @@ if ~isempty(instrfind)
   delete(instrfind);
 end
 
-s = serial('COM6', 'baudrate', 9600); % scale
+s = serialport('COM6', 9600); % scale
  set(s,'Parity', 'none');
  set(s,'DataBits', 8);
  set(s,'StopBit', 1);
@@ -43,9 +45,9 @@ s = serial('COM6', 'baudrate', 9600); % scale
 fopen(s)
 %% 
 % constants
-empty_tank_dist = 25;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 22.5 ;  % cm  (CHANGE LATER?)
-pause_time = 5; % seconds, waiting time between arduino operations
+empty_tank_dist = 22.3;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_dist = 21.5;  % cm  (CHANGE LATER?)
+pause_time = 0.5; % seconds, waiting time between arduino operations
 flow_loop_volume = 120; % ml, the total amount of water in one batch
 flush_tube_volume = 72; % ml, the amount water in the tubes
 
@@ -57,8 +59,6 @@ conductivity_list = [];
 flowrate_list = [0];
 permeate_flowrate_list = [0];
 permeate_volume_list = [0];
-pres_trans_list = [];
-flushed_volume_list = [];
 
 % main code 
 run = 1;
@@ -72,10 +72,10 @@ while run == 1
     %save(filename,"tobesaved",'-ascii','-tabs');
 
     % REGULAR DATA COLLECTION
-    conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin_pos, conductivity_pin_neg);
-    [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
+    conductivity_list = conductivity_reading_daq(dq,conductivity_list);
+    [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
     [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
+    [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
     [mass_list, mass] = scale_reading(s, mass_list);
     
     % Read time
@@ -126,10 +126,10 @@ while run == 1
                     start_flushing = tic();
 
                     % REGULAR DATA COLLECTION
-                    conductivity_list = conductivity_reading(a,conductivity_list,conductivity_pin_pos, conductivity_pin_neg);
+                    conductivity_list = conductivity_reading_daq(dq,conductivity_list);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    [flowrate_list, current_flowrate] = flowrate_reading(a, flowrate_list, flowrate_pin);
                     [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
+                    [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
                     [mass_list, mass] = scale_reading(s, mass_list);
                 
                     % Append time (from first start run) to data list
