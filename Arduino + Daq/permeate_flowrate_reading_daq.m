@@ -12,5 +12,15 @@ function [perm_flowrate_list, perm_flowrate] = permeate_flowrate_reading_daq(daq
     voltage = read(daqName, "OutputFormat", "Matrix");
 
     perm_flowrate = voltage(1) * 20; % 20 calculated by max flow rate(100ml/min) / 5v 
+   
+    % this while loop checks for flowrate values and re-measures
+    % in the case that the value is negative
+    while perm_flowrate < 0
+          voltage = read(daqName, "OutputFormat", "Matrix");
+          perm_flowrate = voltage(1) * 20; % 20 calculated by max flow rate(100ml/min) / 5v 
+    end
+
     perm_flowrate_list(end+1, 1) = perm_flowrate;
+
+
 end

@@ -16,6 +16,15 @@ function [flowrate_list,flowrate] = flowrate_reading_daq(daqName, flowrate_list)
     %voltage_in = voltage_out * 1/(((3.3/1024)*5)*63)
     
     flowrate = voltage(2) * 200; % 200 calculated by max flow rate (1000ml/min) / 5v
+
+    
+    % this while loop checks for flowrate values and re-measures
+    % in the case that the value is negative
+    while flowrate < 0
+          voltage = read(daqName, "OutputFormat", "Matrix");
+          flowrate = voltage(2) * 200; % 20 calculated by max flow rate(100ml/min) / 5v 
+    end
+
     flowrate_list(end+1, 1) = flowrate;
 
 end
