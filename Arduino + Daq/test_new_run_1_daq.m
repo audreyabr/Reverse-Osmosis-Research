@@ -71,12 +71,13 @@ t = tic();
 %%
 while run == 1
     % REGULAR DATA COLLECTION
-    [conductivity_list,conductivity] = conductivity_reading_daq(dq,conductivity_list);
+    % [conductivity_list,conductivity] = conductivity_reading_daq(dq,conductivity_list);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
-    [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
-    [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
+    % [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
+    % [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
     [mass_list, mass] = scale_reading(s, mass_list);
+    [perm_flowrate_list, perm_flowrate, flowrate_list, flowrate, conductivity_list, conductivity] = daq_reading(daqName, perm_flowrate_list, flowrate_list, conductivity_list);
     
     % Read time
     time_now = toc(t); 
@@ -130,12 +131,13 @@ while run == 1
                     start_flushing = tic();
 
                     % REGULAR DATA COLLECTION
-                    conductivity_list = conductivity_reading_daq(dq,conductivity_list);
+                    % conductivity_list = conductivity_reading_daq(dq,conductivity_list);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
-                    [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
+                    % [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
+                    % [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
                     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
                     [mass_list, mass] = scale_reading(s, mass_list);
+                    [perm_flowrate_list, perm_flowrate, flowrate_list, flowrate, conductivity_list, conductivity] = daq_reading(daqName, perm_flowrate_list, flowrate_list, conductivity_list);
                 
                     % Append time (from first start run) to data list
                     time_now =  toc(t);
