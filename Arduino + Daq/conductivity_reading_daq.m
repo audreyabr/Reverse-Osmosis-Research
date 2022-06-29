@@ -1,4 +1,4 @@
-function conductivity_list = conductivity_reading_daq(daqName, conductivity_list)
+function [conductivity_list,conductivity] = conductivity_reading_daq(daqName, conductivity_list)
 
 % Takes in the current conductivity list, takes the next
 % conductivity reading and appends it onto the list

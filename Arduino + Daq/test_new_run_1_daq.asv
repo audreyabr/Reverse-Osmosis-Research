@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-%filename = 'live_data.txt';
+filename = 'live_data.txt';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -70,11 +70,8 @@ t = tic();
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
 %%
 while run == 1
-    %tobesaved = [distance_list,conductivity_list,permeate_flowrate_list,flowrate_list]; 
-    %save(filename,"tobesaved",'-ascii','-tabs');
-
     % REGULAR DATA COLLECTION
-    conductivity_list = conductivity_reading_daq(dq,conductivity_list);
+    [conductivity_list,conductivity] = conductivity_reading_daq(dq,conductivity_list);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
     [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
     [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
@@ -84,6 +81,10 @@ while run == 1
     % Read time
     time_now = toc(t); 
     time_list = time_readings(time_list, time_now);
+    
+    % Save live data
+    tobesaved = [time_now,conductivity(1), distance,current_permeate_flowrate, current_flowrate, pres_trans_value, mass]; 
+    save(filename,"tobesaved",'-append', '-ascii', '-tabs');
     
     % Calculate for permeate volume
     [permeate_volume_list, permeate_volume] = integrate_permeate_volume(time_list,permeate_flowrate_list, permeate_volume_list);
@@ -139,6 +140,10 @@ while run == 1
                     % Append time (from first start run) to data list
                     time_now =  toc(t);
                     time_list = time_readings(time_list, time_now);
+                    
+                    % Save live data
+                    tobesaved = [time_now, distance,current_permeate_flowrate,current_flowrate,pres_trans_value,mass]; 
+                    save(filename,"tobesaved",'-append', '-ascii', '-tabs');
                         
                     % Calculate for permeate volume
                     [permeate_volume_list, permeate_volume] = integrate_permeate_volume(time_list,permeate_flowrate_list, permeate_volume_list);
