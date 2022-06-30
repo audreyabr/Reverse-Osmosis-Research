@@ -1,0 +1,35 @@
+function [perm_flowrate_list, permeat_flowrate, flowrate_list, flowrate, conductivity_list, conductivity] = daq_reading(daqName, perm_flowrate_list, flowrate_list, conductivity_list)
+    
+    % Initialize 
+    index = 25;
+    voltage_list = [];
+
+    % taking multiple readings from each input pin
+    for i = 1:index
+        voltage_list(i,1:3) = read(daqName, "OutputFormat", "Matrix");
+    end 
+    
+    % remove outliers and calculate average
+    voltage_list = rmoutliers(voltage_list);
+    mean_voltage_list = mean(voltage_list);
+    permeate_voltage = mean_voltage_list(1);
+    batch_voltage = mean_voltage_list(2);
+    conductivity_voltage = mean_voltage_list(3);
+
+    % convert voltage values into actual flowrates and conductivity
+    permeate_flowrate = permeate_voltage *20;
+    batch_flowrate = batch_voltage *200;
+    conductivity_voltage
+
+%     % conductivity
+%     R = 200; % resistance in ohms - 
+%     % this value is chosen so that cond_pin_neg voltage is between 1V
+%     % and 4.2V
+%     
+%     I = voltage(3) / R; % I in A
+%     K = 100;
+%     conductivity = (2000* (I * 1000 - 4)) / (16 * K); % I in mA
+%     
+%     conductivity_list(end+1, 1:2) = [conductivity, voltage(3)];
+% 
+% end

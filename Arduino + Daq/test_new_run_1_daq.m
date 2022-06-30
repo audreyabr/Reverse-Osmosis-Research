@@ -9,14 +9,11 @@ echo_pin = 'D9';
 batch_valve_pin = 'D4';
 brine_valve_pin = 'D3';
 feed_valve_pin = 'D5';
-% flowrate_pin = 'A0';
-% conductivity_pin = 'A1';
-% perm_flowrate_pin = 'A2';
 pressure_transducer_pin = 'A3';
 
 
 % Setup Arduino and Ultrasonic sensor
-a = arduino('COM4', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % set up daq
@@ -33,18 +30,18 @@ ch02ai = addinput(dq,Daqtype,'ai2','Voltage');  % conductivity in Channel AI2
 ch02ai.TerminalConfig = 'Differential';
 
 % Setup Scale (optional since now permeate flowmeter is working!)
-if ~isempty(instrfind)
-  fclose(instrfind);
-  delete(instrfind);
-end
-
-s = serialport('COM6', 9600); % scale
- set(s,'Parity', 'none');
- set(s,'DataBits', 8);
- set(s,'StopBit', 1);
-
-fopen(s)
-%% 
+% if ~isempty(instrfind)
+%   fclose(instrfind);
+%   delete(instrfind);
+% end
+% 
+% s = serial('COM6 q', "Baudrate", 9600); % scale
+%  set(s,'Parity', 'none');
+%  set(s,'DataBits', 8);
+%  set(s,'StopBit', 1);
+% 
+% fopen(s)
+%%
 % constants
 empty_tank_dist = 22.3;  % cm, top of the tank to the top of the drainage square with some extra room
 full_tank_dist = 21.5;  % cm  (CHANGE LATER?)
@@ -71,25 +68,22 @@ t = tic();
 %%
 while run == 1
     % REGULAR DATA COLLECTION
-    % [conductivity_list,conductivity] = conductivity_reading_daq(dq,conductivity_list);
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
-    % [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
-    % [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
-    [mass_list, mass] = scale_reading(s, mass_list);
-    [perm_flowrate_list, perm_flowrate, flowrate_list, flowrate, conductivity_list, conductivity] = daq_reading(daqName, perm_flowrate_list, flowrate_list, conductivity_list);
+    %[mass_list, mass] = scale_reading(s, mass_list);
+    [permeate_flowrate_list, current_permeate_flowrate, flowrate_list, current_flowrate, conductivity_list, conductivity] = daq_reading(dq, permeate_flowrate_list, flowrate_list, conductivity_list);
     
     % Read time
     time_now = toc(t); 
     time_list = time_readings(time_list, time_now);
     
-    % Save live data
-    tobesaved = [time_now, conductivity(1), distance, current_permeate_flowrate, current_flowrate, pres_trans_value, mass]; 
-    save(filename,"tobesaved",'-append', '-ascii', '-tabs');
-    
     % Calculate for permeate volume
     [permeate_volume_list, permeate_volume] = integrate_permeate_volume(time_list,permeate_flowrate_list, permeate_volume_list);
     
+    % Save live data
+    tobesaved = [time_now, conductivity, distance, current_permeate_flowrate, current_flowrate, permeate_volume, pres_trans_value]; 
+    save(filename,"tobesaved",'-append', '-ascii', '-tabs');
+
     % Check if full
     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
     
@@ -131,25 +125,22 @@ while run == 1
                     start_flushing = tic();
 
                     % REGULAR DATA COLLECTION
-                    % conductivity_list = conductivity_reading_daq(dq,conductivity_list);
                     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin); 
-                    % [permeate_flowrate_list, current_permeate_flowrate] = permeate_flowrate_reading_daq(dq, permeate_flowrate_list);
-                    % [flowrate_list, current_flowrate] = flowrate_reading_daq(dq, flowrate_list);
                     [pres_trans_list, pres_trans_value] = pres_trans_reading(a,pres_trans_list,pressure_transducer_pin);
-                    [mass_list, mass] = scale_reading(s, mass_list);
-                    [perm_flowrate_list, perm_flowrate, flowrate_list, flowrate, conductivity_list, conductivity] = daq_reading(daqName, perm_flowrate_list, flowrate_list, conductivity_list);
+                    % [mass_list, mass] = scale_reading(s, mass_list);
+                    [permeate_flowrate_list, current_permeate_flowrate, flowrate_list, current_flowrate, conductivity_list, conductivity] = daq_reading(daqName, permeate_flowrate_list, flowrate_list, conductivity_list);
                 
                     % Append time (from first start run) to data list
                     time_now =  toc(t);
                     time_list = time_readings(time_list, time_now);
-                    
-                    % Save live data
-                    tobesaved = [time_now, distance,current_permeate_flowrate,current_flowrate,pres_trans_value,mass]; 
-                    save(filename,"tobesaved",'-append', '-ascii', '-tabs');
-                        
+                   
                     % Calculate for permeate volume
                     [permeate_volume_list, permeate_volume] = integrate_permeate_volume(time_list,permeate_flowrate_list, permeate_volume_list);
                      
+                    % Save live data
+                    tobesaved = [time_now, conductivity, distance, current_permeate_flowrate, current_flowrate, permeate_volume, pres_trans_value];  
+                    save(filename,"tobesaved",'-append', '-ascii', '-tabs');
+                        
                     % Calculate for volume flushed
                     added_volume = volume_step_approx(time_step_flushing, last_flowrate, current_flowrate);
                     volume_flushed = volume_flushed + added_volume;
