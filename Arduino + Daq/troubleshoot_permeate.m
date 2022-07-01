@@ -15,14 +15,14 @@ ch01ai = addinput(dq,Daqtype,'ai1','Voltage');  % batch flowrate in Channel AI1(
 ch01ai.TerminalConfig = 'SingleEnded';
 ch02ai = addinput(dq,Daqtype,'ai2','Voltage');  % conductivity in Channel AI2
 ch02ai.TerminalConfig = 'Differential';
-
+%%
 % Setup Scale
 % if ~isempty(instrfind)
 %   fclose(instrfind);
 %   delete(instrfind);
 % end
 % 
-s = serial('COM6 q', "Baudrate", 9600); % scale
+s = serial('COM4', "Baudrate", 9600) % scale
  set(s,'Parity', 'none');
  set(s,'DataBits', 8);
  set(s,'StopBit', 1);
@@ -50,8 +50,10 @@ permeate_volume_list = [0];
 run = 1;
 t = tic();
 
+close all
 figure
-%%
+
+
 while run == 1
     % REGULAR DATA COLLECTION
       % Read time
