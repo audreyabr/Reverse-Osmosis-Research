@@ -1,12 +1,15 @@
 function [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_flowrate, conductivity_list, conductivity] = daq_reading(daqName, permeate_flowrate_list, batch_flowrate_list, conductivity_list)
-    
+%it read this before: function [voltage_list, permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_flowrate, conductivity_list, conductivity] = daq_reading(daqName, permeate_flowrate_list, batch_flowrate_list, conductivity_list)
+
     % Initialize 
     index = 25;
     voltage_list = [];
 
     % taking multiple readings from each input pin
     for i = 1:index
+        daqName.Rate = 5000;
         voltage_list(i,1:3) = read(daqName, "OutputFormat", "Matrix");
+
     end 
     
     % calculate average

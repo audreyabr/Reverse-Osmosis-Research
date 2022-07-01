@@ -59,7 +59,6 @@ t = tic();
 close all
 figure
 
-    time_now = toc(t); 
 
 while time_now < 60
     % REGULAR DATA COLLECTION
@@ -78,7 +77,7 @@ while time_now < 60
     scale_flowrate_list=[scale_flowrate_list;(mass_list(end)-mass_list(end-1))./(time_list(end)-time_list(end-1))*60];
     oldmass=newmass;
     [permeate_flowrate_list, current_permeate_flowrate, flowrate_list, current_flowrate, conductivity_list, conductivity] = daq_reading(dq, permeate_flowrate_list, flowrate_list, conductivity_list);
-    perm_flowmeter_added_mass=[perm_flowmeter_added_mass;perm_flowmeter_added_mass(end)+current_permeate_flowrate*(time_list(end)-time_list(end-1))/60];
+    perm_flowmeter_added_mass=perm_flowmeter_added_mass+current_permeate_flowrate*(time_list(end)-time_list(end-1))/60;
 
 
 if length(time_list)>=4
@@ -87,13 +86,9 @@ if length(time_list)>=4
     ylabel('Permeate flowrate [mL/min]')
     legend('Flowmeter','Scale')
 end
+perm_FM_mass=mass_list(2)+
 drawnow
 pause(3)    
 end 
 
-perm_FM_mass=mass_list(2)+perm_flowmeter_added_mass;
-figure    
-plot(time_list(2:end-3),perm_FM_mass(2:end-3),time_list(2:end),mass_list(2:end))
-    xlabel('Time [s]')
-    ylabel('Permeate mass [g]')
-    legend('Flowmeter','Scale')
+perm_mass=
