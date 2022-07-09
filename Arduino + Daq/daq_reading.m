@@ -4,6 +4,7 @@ function [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_
     % Initialize 
     index = 25;
     voltage_list = [];
+    conductivity_voltage_list_rmo = [];
 
     % taking multiple readings from each input pin
     for i = 1:index
@@ -11,12 +12,15 @@ function [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_
         voltage_list(i,1:3) = read(daqName, "OutputFormat", "Matrix");
 
     end 
-    
-    % calculate average
-    mean_voltage_list = mean(voltage_list);
+
+    % calculate average for flowrates voltages
+    mean_voltage_list = mean(voltage_list(:,1:2));
     permeate_voltage = mean_voltage_list(1);
     batch_voltage = mean_voltage_list(2);
-    conductivity_voltage = mean_voltage_list(3);
+
+    % remove outliers and calculate average for conductivity voltages
+    conductivity_voltage_list_rmo = rmoutliers(voltage_list(:,3));
+    conductivity_voltage = mean(conductivity_voltage_list_rmo);
 
     % convert voltage values into flowrates
     permeate_flowrate = permeate_voltage *20;
