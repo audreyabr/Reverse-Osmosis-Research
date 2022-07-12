@@ -53,8 +53,6 @@ disp("Batch Number: " + batch_number)
  
 %%
 while run == 1
-    disp("Batch Number: " + batch_number)
-    
     % REGULAR DATA COLLECTION
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
     [permeate_flowrate_list, current_permeate_flowrate, flowrate_list, current_flowrate, conductivity_list, conductivity] = daq_reading(dq, permeate_flowrate_list, flowrate_list, conductivity_list);
@@ -110,8 +108,6 @@ while run == 1
 
             % flushing loop
             while volume_flushed < flush_tube_volume
-                disp("Batch Number: " + batch_number)
-                
                 % start flushing timer
                 start_flushing = tic();
 

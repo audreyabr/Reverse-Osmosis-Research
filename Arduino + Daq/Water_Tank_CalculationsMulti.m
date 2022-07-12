@@ -1,3 +1,18 @@
+% % Part 1: Convert the list of distance readings to a volume list 
+% volume_list = [];
+% for i=1:length(distance_list)
+%     volume_list(i,1)= Water_Tank_Calculations(29.845-distance_list(i));
+% end
+%%
+% Part 2: Calculating volume with each individual distance reading
+% comment out parts that are not used
+ultr_height = 29.845; %cm
+distance_1 = input("Enter distance measured by ultrosonic sensor: ");
+distance_2 = input("Enter longer distance measured by ultrosonic sensor: ");
+volume_1 = Water_Tank_Calculations(ultr_height - distance_1);
+volume_diff = Water_Tank_Calculations(ultr_height - distance_1) - Water_Tank_Calculations(ultr_height - distance_2);
+disp("volume: " + volume_diff + "ml")
+%disp("volume: " + volume_1 + "ml")
 %% Assumptions
 % I am assuming a wall thickness of 1/8, or 0.125 inch, according to the
 % McMaster website specifications. In the McMaster Solidworks file, the
