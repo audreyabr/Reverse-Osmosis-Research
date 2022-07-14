@@ -10,7 +10,7 @@ function [saturation_index] = gypsum_SI_from_molarity(CaSO4_molarity)
 CaSO4_molality=CaSO4_molarity;%assuming low-salinity water with density approximately 1 kg/L
 saturation_index = 0.527*log(CaSO4_molality*1000) - 1.5073;
 
-    if (saturation_index > 0.6) || (saturation_index < 0)%limits output to range of correlation
-        saturation_index = NaN;
-    end
+%     if (saturation_index > 0.6) || (saturation_index < 0)%limits output to range of correlation
+%         saturation_index = NaN;
+%     end
 end

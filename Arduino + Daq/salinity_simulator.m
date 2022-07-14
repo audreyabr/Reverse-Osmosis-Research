@@ -15,8 +15,8 @@ if salt_name == "NaCl"||salt_name == "nacl"||salt_name == "sodium chloride"
 end
 
 if salt_name == "CaSO4"||salt_name == "caso4"||salt_name == "calcium sulfate"
-    cond_at_1pct = 17.6;    % conductivity in mS/cm for 1% NaCl
-    molar_mass = 136.14; % g/mol
+    cond_at_1pct = 22.8;    % measured conductivity in mS/cm for 1% NaCl
+    molar_mass = 147.01; % g/mol
 end
 
 % calculation
@@ -33,6 +33,6 @@ batch_conductivity = batch_salinity_pct * cond_at_1pct; % mS
 % output brine salinity and conductivity range
 disp("batch conductivity(mS): " + batch_conductivity)
 disp("brine conductivity(mS): " + brine_conductivity)
-disp("salinity range of this batch(mM): " + batch_salinity + " to " + brine_salinit)
+disp("salinity range of this batch(mM): " + batch_salinity + " to " + brine_salinity)
 end
 
