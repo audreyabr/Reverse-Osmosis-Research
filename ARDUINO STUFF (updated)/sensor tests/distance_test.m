@@ -1,6 +1,6 @@
 clear
 
-a = arduino ('COM8', 'Mega2560', 'Libraries','Ultrasonic');
+a = arduino ('COM18', 'Mega2560', 'Libraries','Ultrasonic');
 
 % Pinouts 
 triggerPin= 'D8';

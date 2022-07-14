@@ -12,7 +12,7 @@ feed_valve_pin = 'D5';
 perm_flowrate_pin = 'A2';
 
 % set up Arduino and Ultrasonic sensor
-a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM18', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % set up DAQ
@@ -33,19 +33,19 @@ ch02ai.TerminalConfig = 'Differential';
 initial_conductivity = input("initial conductivity(mS): ");
 conductivity_buffer = 0.1 * initial_conductivity;
 empty_tank_dist = 26;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 19;  % cm  (CHANGE LATER?)
+full_tank_dist = 20;  % cm  (CHANGE LATER?)
 pause_time = 0.5; % seconds, waiting time between arduino operations
 max_flush_volume = 200; % ml, max amount to be flushed if conductivity does not reset
 
 % initialize
 time_list = [0];
-distance_list = [];
-conductivity_list = [];
+distance_list = [0];
+conductivity_list = [0];
 flowrate_list = [0];
 permeate_flowrate_list= [0];
 permeate_volume_list = [0];
 batch_number = 1;
-
+tank_state_list = [0];
 % main code 
 run = 1;
 t = tic();
@@ -69,6 +69,7 @@ while run == 1
     
     % Check if full
     tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
+    tank_state_list(end+1,1) = tank_state;
     
     % Save live data
     tobesaved = [time_list, conductivity_list, distance_list, permeate_flowrate_list, flowrate_list, permeate_volume_list, tank_state_list]; 
@@ -140,7 +141,8 @@ while run == 1
 
                 % update tank state and stop feed if full
                 tank_state = check_tank_state(empty_tank_dist, full_tank_dist, distance);
-                
+                tank_state_list(end+1,1) = tank_state;
+
                 % Save live data
                 tobesaved = [time_list, conductivity_list, distance_list, permeate_flowrate_list, flowrate_list, permeate_volume_list, tank_state_list]; 
                 csvwrite(filename, tobesaved);
