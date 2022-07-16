@@ -44,8 +44,11 @@ conductivity_list = [0];
 flowrate_list = [0];
 permeate_flowrate_list= [0];
 permeate_volume_list = [0];
+flushed_volume_list = [0];
 batch_number = 1;
 tank_state_list = [0];
+
+
 % main code 
 run = 1;
 t = tic();
@@ -87,6 +90,10 @@ while run == 1
     
     % if tank is empty: open feed valve
     if tank_state == 0
+        
+        % open feed valve
+        writeDigitalPin(a,feed_valve_pin,0);
+        pause(pause_time) % valve delay time
         
         % Display current batch number
         batch_number = batch_number + 1;
@@ -160,7 +167,7 @@ while run == 1
             writeDigitalPin(a,brine_valve_pin,1) % close brine valve
             pause(pause_time) % valve delay time
 
-            disp("Flush volume achieved " + flush_tube_volume + "..CLOSED BRINE, OPENED BATCH")
+            disp("Flush volume achieved " + max_flush_volume + "..CLOSED BRINE, OPENED BATCH")
         end 
     end 
 end 

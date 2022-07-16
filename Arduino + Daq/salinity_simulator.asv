@@ -31,7 +31,7 @@ batch_conductivity = batch_salinity_pct * cond_at_1pct; % mS
 
 % calculate avg osmotic pressure - van't Hoff Equation
 % Feed osmotic pressure
-NaCl_molarity = batch_salinity * 2 / 1000 % M (g/kg)
+NaCl_molarity = batch_salinity * 2 / 1000 % M
 CaSO4_molarity = batch_salinity / 1000 % M
 feed_osmotic = 8.308 * 0.93 * (T + 273.15) * (NaCl_molarity * molar_mass_NaCl + CaSO4_molarity * molar_mass_CaSO4);% kPa
 feed_membrane_osmotic = 1.1 * feed_osmotic; % kPa
@@ -63,6 +63,5 @@ disp("batch conductivity(mS): " + batch_conductivity)
 disp("brine conductivity(mS): " + brine_conductivity)
 disp("salinity range of this batch(mM): " + batch_salinity + " to " + brine_salinity)
 disp("batch time: " + time)
-
 end
 
