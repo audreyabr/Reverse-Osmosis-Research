@@ -42,7 +42,7 @@ function res = Water_Tank_Calculations(overall_height)
 
     V_triangle = V_trian(h_triangle);
 
-    res = h_square*2*2 + V_triangle + h_rectangle*29.845*17.145;% + 7*overall_height;
+    res = h_square*5.08*5.08 + V_triangle + h_rectangle*29.845*17.145;% + 7*overall_height;
 end
 
 %% change this to find Volume of the triangular portion, based on height
@@ -58,10 +58,10 @@ end
 % using negative space. It also accounts for the thickness of the walls.
 
 function res = V_trian(h_trian)
-    w_1 = 2;
-    w_2 = 2 + 1.2214 * h_trian;
+    w_1 = 5.08; % cm
+    w_2 = 5.08 + 1.2214 * h_trian;
     w_3 = 0.6107 * h_trian;
-    L_1 = 2;
+    L_1 = 5.08; % cm
     L_2 = 2.5071 * h_trian;
 
     V_1 = h_trian * 0.5 * (w_1 + w_2) * L_1;  % volume of trapezoidal prism

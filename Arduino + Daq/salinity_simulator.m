@@ -1,68 +1,43 @@
-function [brine_salinity,brine_conductivity,batch_salinity,batch_conductivity] = salinity_simulator()
-
-% input theoratical batch distances, salinity, and brine volume
-full_dis = input("full distance: "); % cm
-empty_dis = input("empty distance: "); % cm
-batch_salinity = input("Feed salinity(mM): ");
-feed_pressure = input("Feed pressure(psi): ");
+function [dist_full,dist_empty,batch_vol,brine_vol,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4] = salinity_simulator(feed_concn,batch_time,RR)
+% calculate batch volume(L), distance of full and empty(cm), minimal feed
+% pressure(psi), brine conductvity(mS), Na2SO4 and CaCl2-H2O needed(g)
+% based on intended feed concentration(mM), batch time(hour) and recovery rate(%)
 
 % constants
-tank_height = 29.845; % cm
 membrane_area = 0.0238; % m^2 (SW measurement feed side, 2019 module)
-T = 25; % Celsius, tempareture of water
-flush_tube_volume = 170; % ml, estimated with current tubing loop
+T = 25 + 273.15; % Kelvin, tempareture of water
+flush_tube_volume = 0.170; % L, estimated with current tubing loop
 Kw= 3.39755; %L/m2.h.bar, calculated with BW30-4040 membrane
-
-cond_at_1pct = 22.8;    % measured conductivity in mS/cm for 1% CaSO4
+cond_at_01pct = 3.2;    % measured conductivity in mS/cm for 0.1% CaSO4
 molar_mass_CaSO4 = 147.01; % g/mol
-molar_mass_NaCl = 58.44; % g/mol
 
-% calculate batch and brine volume, salinity, conductivity
-batch_vol = Water_Tank_Calculations(tank_height - full_dis) - Water_Tank_Calculations(tank_height - empty_dis); % ml
-brine_vol = Water_Tank_Calculations(tank_height - empty_dis) + flush_tube_volume;% ml
-RR = (batch_vol - brine_vol) / batch_vol;
+% calculate for minimal hydraulic pressure
+brine_concn = feed_concn / (1 - RR);% mM,concentration of CaSO4 in brine
+feed_osmotic = 8.314 * T * 6 * feed_concn / 1000;% kPa, feed osmotic pressure calculated by van't Hoff equation
+feed_membrane_osmotic = 1.1 * feed_osmotic; % kPa, feed osmotic pressure at membrane
+brine_osmotic =  8.314 * T * 6 * brine_concn / 1000;% kPa, brine osmotic pressure
+brine_membrane_osmotic = 1.1 * brine_osmotic; % kPa, brine osmotic pressure at membrane
+min_feed_pres = 0.1450 * (brine_membrane_osmotic + 100); % psi, minimal hydraulic pressure needed
 
-brine_salinity = batch_salinity/(1-RR); % milimolar - 1/1000mol/L (RR: recovery rate)
-brine_salinity_pct = 100 * (((brine_salinity / 1000) * molar_mass_CaSO4) / 1000) % assume water density is 1000g/L
-brine_conductivity = brine_salinity_pct * cond_at_1pct;
+% calculate for batch volume
+avg_osmotic =(feed_membrane_osmotic + brine_membrane_osmotic) / 2; % kPa
+avg_flux = (min_feed_pres * 0.06895 - avg_osmotic * 0.01) * Kw; % L/m2.h, converted pressure to bar
+avg_flowrate = avg_flux * membrane_area; % L/h
+batch_vol = batch_time * avg_flowrate; % L
+brine_vol = batch_vol * (1 - RR); % L
 
-batch_salinity_pct = 100 * (((batch_salinity / 1000) * molar_mass_CaSO4) / 1000) % in percent
-batch_conductivity = batch_salinity_pct * cond_at_1pct; % mS
+% calculate tank distances of full and empty
+dist_empty = Reverse_Tank_Calculation(max(0,brine_vol - flush_tube_volume));
+dist_full = Reverse_Tank_Calculation(batch_vol);
 
-% calculate avg osmotic pressure - van't Hoff Equation
-% Feed osmotic pressure
-NaCl_molarity = batch_salinity * 2 / 1000 % M (g/kg)
-CaSO4_molarity = batch_salinity / 1000 % M
-feed_osmotic = 8.308 * 0.93 * (T + 273.15) * (NaCl_molarity * molar_mass_NaCl + CaSO4_molarity * molar_mass_CaSO4);% kPa
-feed_membrane_osmotic = 1.1 * feed_osmotic; % kPa
-% brine osmotic pressure
-NaCl_molarity_brine = brine_salinity * 2 /1000; % M
-CaSO4_molarity_brine = brine_salinity / 1000; % M
-brine_osmotic = 8.308 * 0.93 * (T + 273.15) * (NaCl_molarity_brine * molar_mass_NaCl + CaSO4_molarity_brine * molar_mass_CaSO4);% kPa
-brine_membrane_osmotic = 1.1 * brine_osmotic; % kPa
-
-osmotic_pressure = (feed_membrane_osmotic + brine_membrane_osmotic) / 2; % kPa
-
-% calculate average flux based on avg osmotic pressure
-feed_pressure_bar = feed_pressure * 0.06894757; % convert psi to bar
-osmotic_pressure_bar = osmotic_pressure * 0.01; % convernt kPa to bar
-avg_flux = (feed_pressure_bar - osmotic_pressure_bar) * Kw; %L/m2.h
-avg_flowrate = avg_flux * membrane_area; %L/h
-time = ((batch_vol - brine_vol)/ 1000) / avg_flowrate; % hour
-
-
-[grams_CaCl_dihydrate,grams_Na2SO4]= CaSO4_mixing(CaSO4_molarity, batch_vol/1000);% convert batch volume to liter
-
-% output brine salinity and conductivity range
-disp("batch volume(mL): " + batch_vol)
-disp("brine volume(mL): " + brine_vol)
-disp("Recovery Rate(mL): " + RR)
-disp("Add CaCl2: " + grams_CaCl_dihydrate)
-disp("Add Na2SO4: " + grams_Na2SO4)
-disp("batch conductivity(mS): " + batch_conductivity)
-disp("brine conductivity(mS): " + brine_conductivity)
-disp("salinity range of this batch(mM): " + batch_salinity + " to " + brine_salinity)
-disp("batch time: " + time)
+% calculate Na2SO4 and CaCl2-H2O mass
+[grams_CaCl_dihydrate,grams_Na2SO4]= CaSO4_mixing(feed_concn/1000, batch_vol);% inputs: concentration(mol/L)
+                                                                              %         volume(L)
+% calculate conductivities
+brine_salinity_pct = 100 * (((brine_concn / 1000) * molar_mass_CaSO4) / 1000); %in percent, salinity of CaSO4
+brine_conductivity = brine_salinity_pct * cond_at_01pct * 10; % mS
+batch_salinity_pct = 100 * (((feed_concn / 1000) * molar_mass_CaSO4) / 1000); %in percent, salinity of CaSO4
+batch_conductivity = batch_salinity_pct * cond_at_01pct * 10; % mS
 
 end
 
