@@ -9,8 +9,7 @@ membrane_area = 0.0238; % m^2 (SW measurement feed side, 2019 module)
 T = 25 + 273.15; % Kelvin, tempareture of water
 flush_tube_volume = 0.170; % L, estimated with current tubing loop
 Kw= 3.39755; %L/m2.h.bar, calculated with BW30-4040 membrane
-cond_at_1pct = 31.3;    % mS/cm, ten times measured conductivity for 0.1% CaSO4
-molar_mass_CaSO4 = 147.01; % g/mol
+unit_condu = 0.495;    % mS/cm, conductivity of 1mM of CaSO4 and 2mM of NaCl
 
 % calculate for minimal hydraulic pressure
 brine_concn = feed_concn / (1 - RR);% mM,concentration of CaSO4 in brine
@@ -18,7 +17,7 @@ feed_osmotic = 8.314 * T * 6 * feed_concn / 1000;% kPa, feed osmotic pressure ca
 feed_membrane_osmotic = 1.1 * feed_osmotic; % kPa, feed osmotic pressure at membrane
 brine_osmotic =  8.314 * T * 6 * brine_concn / 1000;% kPa, brine osmotic pressure
 brine_membrane_osmotic = 0.1450 * 1.1 * brine_osmotic; % psi, brine osmotic pressure at membrane converted to psi
-min_feed_pres = brine_membrane_osmotic + 200; % psi, minimal hydraulic pressure needed
+min_feed_pres = 400; % psi, minimal hydraulic pressure needed
 
 % calculate for batch volume
 avg_osmotic =(feed_membrane_osmotic + brine_membrane_osmotic) / 2; % kPa
@@ -35,10 +34,7 @@ dist_full = Reverse_Tank_Calculation(batch_vol);
 [grams_CaCl_dihydrate,grams_Na2SO4]= CaSO4_mixing(feed_concn/1000, batch_vol);% inputs: concentration(mol/L)
                                                                               %         volume(L)
 % calculate conductivities
-brine_salinity_pct = ((brine_concn / 1000) * molar_mass_CaSO4) / 1000; %in percent, salinity of CaSO4
-brine_conductivity = brine_salinity_pct * cond_at_1pct * 10; % mS
-batch_salinity_pct = ((feed_concn / 1000) * molar_mass_CaSO4) / 1000; %in percent, salinity of CaSO4
-batch_conductivity = batch_salinity_pct * cond_at_1pct * 10; % mS
-
+brine_conductivity = brine_concn * unit_condu; % mS
+batch_conductivity = feed_concn * unit_condu; % mS
 end
 
