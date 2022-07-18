@@ -12,7 +12,7 @@ function ultrasoni_distance = Reverse_Tank_Calculation(volume)
     TRI_HEIGHT = 11.52652; % cm, tank bottom to triangular top
     TRI_VOL = 1.3872e+03; % ml, total triangular volume
     REC_AREA = 29.845 * 17.145; % cm2
-    REC_VOL = 5.2799e+03; % cm3, max volume is approximately upto batch valve
+    REC_VOL = REC_AREA * REC_
 
     if volume <= SQUARE_VOL && volume > 0 % only square
         height = volume / SQUARE_AREA;
@@ -34,7 +34,7 @@ function ultrasoni_distance = Reverse_Tank_Calculation(volume)
                                                %    distance measured by
                                                %    ultrasonic from the top
     else
-        ultrasoni_distance = TANK_HEIGHT - height;
+        ultrasoni_distance = NaN;
         disp("volume invalid")
     end
 end 

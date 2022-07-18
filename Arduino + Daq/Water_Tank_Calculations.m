@@ -6,7 +6,9 @@
 
 % Also, my calculations here return a volume slightly less than what my
 % Solidworks Mass Properties says. Perhaps we can pretend this accounts for
-% the fillets inside the box :)
+% the fillets inside the box :) -- Lily Jiang
+
+% This file has been converted from inch to cm :) -- Audrey and Jiayuan
 
 %% Find volumes of all other sections of the tank, with respect to overall height
 
