@@ -1,17 +1,21 @@
 
 % assigning variables
-time = time_list(1:end-1,:);                              % time, seconds
+time = time_list;                              % time, seconds
 conductivity = conductivity_list;                  % conductivity, mS/cm
-distance = distance_list(1:end-1,:);                      % distance, cm
-batch_flow_rate = flowrate_list(1:end-1,:);               % flow rate, mL/min
-permeate_flow_rate = permeate_flowrate_list_D(1:end-1,:);   % flow rate, mL/min
-mass = permeate_volume_list_D(1:end-1,:);                              % mass, g
+distance = distance_list;                      % distance, cm
+batch_flow_rate = flowrate_list;               % flow rate, mL/min
+permeate_flow_rate = permeate_flowrate_list;   % flow rate, mL/min
+mass = permeate_volume_list;                              % mass, g
+
+
+molar_mass_CaSO4 = 136.14; % g/mol
 
 % calculates and plots salinity ,flux, and permeability
 % parameters to enter each time
-sal_pct_i = 0.5;       % initial salinity (in %) for salinity-based estimation of recovery
+milli_mols_initial = 4.5; %mM
+sal_pct_i = (1/1000*molar_mass_CaSO4*milli_mols_initial)/1000*100; % initial salinity (in %) for salinity-based estimation of recovery
 P_psi = 375;            % applied pressure in psi
-permeate_cond = 1.8;  % conductivity of permeate in mS/cm 
+permeate_cond = 160/1000;  % conductivity of permeate in mS/cm 
 
 % preset parameters
 t_min_av = 0.5;         % minutes to average over
