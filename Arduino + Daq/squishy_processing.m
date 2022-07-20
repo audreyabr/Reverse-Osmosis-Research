@@ -1,5 +1,5 @@
 function [salt_rej, mem_CaSO4_conc, conc_polar,SI_gypsum, ind_time, nucl_prob]...
-    = squishy_processing(init_conc,feed_flow,perm_flow,feed_cond,perm_cond)
+    = squishy_processing(init_conc,feed_flow,perm_flow,feed_cond,perm_cond,timestep)
 %by Diana last upload to google drive 7/20/22 around 4:30pm pacific
 % next things to do
 % - find a way to integrate the time step
@@ -15,7 +15,7 @@ function [salt_rej, mem_CaSO4_conc, conc_polar,SI_gypsum, ind_time, nucl_prob]..
 
 % initializing the time step - I feel like this might have to happen outside
 % the function hmmm
-timestep = linspace(0,100,10) % need to figure how to keep time/ need to make for loop
+%timestep = linspace(0,100,10) % need to figure how to keep time/ need to make for loop
 % time = time_list(1:end-1,:);  this came from data_analysis_arduino file
 % what does it mean?
 
@@ -41,5 +41,5 @@ C_t = mem_CaSO4_conc/timestep    % concentration as a funciton of time
 % need the figure this out better, might not be it
 nucl_prob = int(1/(ind_time*C_t),0,timestep)  % nucleation probability
 % need to figure out the integrating over the timesteps
-
+% and how to use the int for integration function in matlab
 end
