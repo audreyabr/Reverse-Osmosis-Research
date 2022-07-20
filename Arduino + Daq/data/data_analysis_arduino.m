@@ -1,11 +1,11 @@
 
 % assigning variables
-time = time_list(1:end-1,:);                              % time, seconds
+time = time_list;                              % time, seconds
 conductivity = conductivity_list;                  % conductivity, mS/cm
-distance = distance_list(1:end-1,:);                      % distance, cm
-batch_flow_rate = flowrate_list(1:end-1,:);               % flow rate, mL/min
-permeate_flow_rate = permeate_flowrate_list_D(1:end-1,:);   % flow rate, mL/min
-mass = permeate_volume_list_D(1:end-1,:);                              % mass, g
+distance = distance_list;                      % distance, cm
+batch_flow_rate = flowrate_list;               % flow rate, mL/min
+permeate_flow_rate = permeate_flowrate_list;   % flow rate, mL/min
+mass = permeate_volume_list;                              % mass, g
 
 % calculates and plots salinity ,flux, and permeability
 % parameters to enter each time

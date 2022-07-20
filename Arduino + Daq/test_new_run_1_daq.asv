@@ -62,8 +62,7 @@ while run == 1
     % REGULAR DATA COLLECTION
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
     [permeate_flowrate_list, current_permeate_flowrate, flowrate_list, current_flowrate, conductivity_list, conductivity] = daq_reading(dq, permeate_flowrate_list, flowrate_list, conductivity_list);
-    disp("permeate flowrate: " + current_permeate_flowrate)
-    
+
     % Read time
     time_now = toc(t); 
     time_list = time_readings(time_list, time_now);

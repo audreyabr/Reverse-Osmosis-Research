@@ -1,0 +1,64 @@
+function vol = Water_Tank_Calculations_3(ultra_dist)
+    %dimension constants of the tank
+    %Lowercase variables are specific height calculated based on volume
+    TANK_HEIGHT = 29.87; % cm, total height of whole tank below sensor
+    TUBE_AREA = 4.11; % cm2,tube caliber
+    TUBE_HEIGHT = 2.286; % cm, tank bottom to tube top
+    SQUARE_HEIGHT = 1.5875 + TUBE_HEIGHT; % cm, tank bottom to square top
+    SQUARE_AREA = 4.953* 4.953; % cm2,cross-section area of bottom square
+    TRI_HEIGHT = 11.7; % cm, tank bottom to triangular top
+    REC_AREA = 29.845 * 17.145; % cm2
+    
+    
+    h_overall = TANK_HEIGHT - ultra_dist;
+    
+    %find volume of rectangle portion at the top
+    if h_overall > TRI_HEIGHT  % max heights of square + triangle in cm
+        h_rectangle = h_overall - TRI_HEIGHT;
+    else
+        h_rectangle = 0;
+    end
+
+    %find volume of triangular volume
+    if h_overall > TRI_HEIGHT
+        h_triangle = TRI_HEIGHT - SQUARE_HEIGHT;
+    elseif h_overall <= TRI_HEIGHT && h_overall > SQUARE_HEIGHT
+        h_triangle = h_overall - SQUARE_HEIGHT;
+    else
+        h_triangle = 0;
+    end
+    
+    %find volume of square portion at the bottom
+    if h_overall > SQUARE_HEIGHT
+        h_square = SQUARE_HEIGHT - TUBE_HEIGHT;
+    elseif h_overall <= SQUARE_HEIGHT && h_overall > TUBE_HEIGHT
+        h_square = h_overall - TUBE_HEIGHT;
+    else
+        h_square = 0;
+    end
+
+    %find volume of tube portion at the bottom
+    if h_overall > TUBE_HEIGHT 
+        h_tube = TUBE_HEIGHT;
+    elseif h_overall <= TUBE_HEIGHT
+        h_tube = h_overall;
+    end
+    
+    triangle_vol = V_trian(h_triangle);
+    vol = h_tube * TUBE_AREA + h_square * SQUARE_AREA + triangle_vol + h_rectangle * REC_AREA;
+end
+
+function res = V_trian(h_trian)
+    w_1 = 4.953; % cm
+    w_2 = 4.953 + 1.283 * h_trian;
+    w_3 = 0.628 * h_trian;
+    L_1 = 4.953; % cm
+    L_2 = 3.05 * h_trian;
+
+    V_1 = h_trian * 0.5 * (w_1 + w_2) * L_1;  % volume of trapezoidal prism
+    V_2 = h_trian * (2/3) * L_2 * w_3;    % volume of the 2 pyramids combined
+    V_3 = h_trian * 0.5 * L_2 * w_1;      % volume of triangular prism
+
+    res = V_1 + V_2 + V_3;
+end
+
