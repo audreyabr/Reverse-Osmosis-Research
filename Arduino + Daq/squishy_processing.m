@@ -1,6 +1,6 @@
 function [salt_rej, mem_CaSO4_conc, conc_polar,SI_gypsum, ind_time, nucl_prob]...
     = squishy_processing(init_conc,feed_flow,perm_flow,feed_cond,perm_cond,timestep)
-%by Diana last upload to google drive 7/20/22 around 4:30pm pacific
+%by Diana last upload to google drive 7/20/22 around 4:55pm pacific
 % next things to do
 % - find a way to integrate the time step
 %   > I would if that would be in this function or in an outer file that
