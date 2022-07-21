@@ -1,4 +1,4 @@
-function [dist_full,dist_empty,batch_vol,brine_vol,brine_concn,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4,feed_vol_gallon,batch_number] = salinity_simulator(feed_concn,batch_time,RR,avg_flux,total_time)
+function [dist_full,dist_empty,batch_vol,brine_vol,brine_concn,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4,feed_vol_gallon,] = salinity_simulator(feed_concn,batch_time,RR,avg_flux,total_time,batch_)
 % calculate batch volume(L), distance of full and empty(cm), minimal feed
 % pressure(psi), brine conductvity(mS), Na2SO4 and CaCl2-H2O needed(g)
 % based on intended feed concentration(mM), batch time(hour), average flux
