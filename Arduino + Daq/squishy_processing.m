@@ -37,9 +37,9 @@ SI_gypsum = 0.527 * log(init_conc) - 1.5073
 ind_time = 1.66*(10^6)*(exp(-0.174*init_conc)) % Induction Time in seconds (s)
 
 % Integrating the Induction Rate over all timepsteps
-C_t = mem_CaSO4_conc/timestep    % concentration as a funciton of time
+C_t = mem_CaSO4_conc./timestep    % concentration as a funciton of time
 % need the figure this out better, might not be it
-nucl_prob = int(1/(ind_time*C_t),0,timestep)  % nucleation probability
+nucl_prob = int(1/(ind_time.*C_t),0,timestep)  % nucleation probability
 % need to figure out the integrating over the timesteps
 % and how to use the int for integration function in matlab
 end
