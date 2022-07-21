@@ -8,7 +8,7 @@ function [dist_full,dist_empty,batch_vol,brine_vol,brine_concn,min_feed_pres,bat
 membrane_area = 0.0238; % m^2 (SW measurement feed side, 2019 module)
 T = 25 + 273.15; % Kelvin, tempareture of water
 flush_tube_volume = 0.10; % L, estimated with current tubing loop (remeasure!)
-Kw= 3.39755; %L/m2.h.bar, calculated with BW30-4040 membrane
+Kw= 2.135; %L/m2.h.bar, calculated with BW30-4040 membrane and adjusted based on test data
 unit_condu = 0.495;    % mS/cm, conductivity of 1mM of CaSO4 and 2mM of NaCl
 
 % calculate for minimal hydraulic pressure
