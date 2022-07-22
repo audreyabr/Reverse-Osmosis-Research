@@ -30,7 +30,7 @@ void loop() {
   Serial.println("loop start");
 
 // we've found that 25 is the best distance to use for the arduino code, takes it right down to the square nub of the tank
-  while (distance <25) {
+  while (distance <26) {
     // put your main code here, to run repeatedly:
     digitalWrite(brine_valve_pin, LOW);
     delay(1000);
