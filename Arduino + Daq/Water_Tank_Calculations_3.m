@@ -88,7 +88,7 @@ end
 % Measured height: 15.49
 % Calculated height: 14.9203
 %% Calculation based on data and polynomial equation
-% error: between 15ml and 100ml
+% error: within 100mL
 function tri_volume = V_trian(h_trian)
     %See google sheet 'experimental curve for volume to distance
     %calculations' for calculation details.
@@ -105,7 +105,7 @@ function tri_volume = V_trian(h_trian)
         SQUARE_HEIGHT = 3.8735; % cm, tank bottom to square top
         UPTO_SQUARE_VOL = 48.3403; % cm3, volume up to the bottom of tri zone
         x = TANK_HEIGHT -(SQUARE_HEIGHT + h_trian); % cm,ultrasonic distance
-        total_volume = 22802 - 1826 * x + 36.9 * x^2;
+        total_volume = 18412 - 1384 * x + 26.1 * x^2;
         tri_volume = total_volume - UPTO_SQUARE_VOL;
     end
     
