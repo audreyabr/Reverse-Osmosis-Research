@@ -35,7 +35,7 @@ function ultrasoni_distance = Reverse_Tank_Calculation(volume)
         height = NaN;
     end
     
-    if height <= TANK_HEIGHT && height > 0
+    if height <= TANK_HEIGHT & height > 0
         ultrasoni_distance = TANK_HEIGHT - height; %cm, convert height(from bottom
                                                %    to waterline) to
                                                %    distance measured by
@@ -45,45 +45,36 @@ function ultrasoni_distance = Reverse_Tank_Calculation(volume)
         disp("volume invalid")
     end
 end 
-      
+%% calculation based on SolidWorks model 
+% function h = Reverse_V_trian(volume)
+%     syms h_trian
+%     w_1 = 4.953; % cm
+%     w_2 = 4.953 + 1.283 * h_trian;
+%     w_3 = 0.628 * h_trian;
+%     L_1 = 4.953; % cm
+%     L_2 = 3.05 * h_trian;
+% 
+%     V_1 = h_trian * 0.5 * (w_1 + w_2) * L_1;  % volume of trapezoidal prism
+%     V_2 = h_trian * (2/3) * L_2 * w_3;    % volume of the 2 pyramids combined
+%     V_3 = h_trian * 0.5 * L_2 * w_1;      % volume of triangular prism
+% 
+%     equ = V_1 + V_2 + V_3 == volume;
+%     h = vpasolve(equ, h_trian,[-Inf Inf]);
+% end
+%% Calculation based on data and polynomial equation 
 function h = Reverse_V_trian(volume)
-    syms h_trian
-    w_1 = 4.953; % cm
-    w_2 = 4.953 + 1.283 * h_trian;
-    w_3 = 0.628 * h_trian;
-    L_1 = 4.953; % cm
-    L_2 = 3.05 * h_trian;
-
-    V_1 = h_trian * 0.5 * (w_1 + w_2) * L_1;  % volume of trapezoidal prism
-    V_2 = h_trian * (2/3) * L_2 * w_3;    % volume of the 2 pyramids combined
-    V_3 = h_trian * 0.5 * L_2 * w_1;      % volume of triangular prism
-
-    equ = V_1 + V_2 + V_3 == volume;
-    h = vpasolve(equ, h_trian,[-Inf Inf]);
+    if volume <= 0
+        h = 0;
+    else % water level within triangular zone
+        syms h_trian
+        TANK_HEIGHT = 29.87;
+        SQUARE_HEIGHT = 3.8735; % cm, tank bottom to square top
+        UPTO_SQUARE_VOL = 48.3403; % cm3, volume up to the bottom of tri zone
+        x = TANK_HEIGHT -(SQUARE_HEIGHT + h_trian); % cm,ultrasonic distance
+        total_volume = 22802 - 1826 * x + 36.9 * x^2;
+        tri_volume = total_volume - UPTO_SQUARE_VOL == volume;
+        h = vpasolve(tri_volume, h_trian,[-Inf Inf]);
+    end 
 end
 
-%% Water tests:
-% 
-% Input volume: 200 mL 
-% Measured height: 23.96
-% Calculated height: 23.464
-% 
-% Input volume: 600 mL 
-% Measured height: 21.02
-% Calculated height: 20.99
-% 
-% Input volume: 1000 mL 
-% Measured height: 19.82
-% Calculated height: 19.53
-% 
-% Input volume: 1600 mL 
-% Measured height: 18.679
-% Calculated height: 18.0472
-% 
-% Input volume: 2400 mL 
-% Measured height: 17.2345
-% Calculated height: 16.4837
-% 
-% Input volume: 3200 mL 
-% Measured height: 15.49
-% Calculated height: 14.9203
+
