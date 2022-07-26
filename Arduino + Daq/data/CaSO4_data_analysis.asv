@@ -96,7 +96,7 @@ figure
 plot(time, sal_mM_av,'o')
 title("Salinity Over Time")
 xlabel('Time (s)')
-ylabel('Salinity (% CaSO4)')
+ylabel('Salinity (% NaCl)')
 
 % plots recover rate
 figure
