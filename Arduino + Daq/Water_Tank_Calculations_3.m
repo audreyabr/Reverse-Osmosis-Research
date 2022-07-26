@@ -105,7 +105,7 @@ function tri_volume = V_trian(h_trian)
         SQUARE_HEIGHT = 3.8735; % cm, tank bottom to square top
         UPTO_SQUARE_VOL = 48.3403; % cm3, volume up to the bottom of tri zone
         x = TANK_HEIGHT -(SQUARE_HEIGHT + h_trian); % cm,ultrasonic distance
-        total_volume = 18412 - 1384 * x + 26.1 * x^2;
+        total_volume = 19391 - 1498 * x + 29 * x^2;
         tri_volume = total_volume - UPTO_SQUARE_VOL;
     end
     

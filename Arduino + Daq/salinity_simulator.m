@@ -1,4 +1,4 @@
-function [dist_full,dist_empty,batch_vol,brine_vol,brine_concn,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4,feed_vol_gallon,batch_number] = salinity_simulator(feed_concn,batch_time,RR,avg_flux,total_time)
+function [dist_full,dist_empty,batch_vol,brine_vol,brine_concn,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4,feed_vol_gallon,batch_number, tot_Na2SO4, tot_CaCl] = salinity_simulator(feed_concn,batch_time,RR,avg_flux,total_time)
 % calculate batch volume(L), distance of full and empty(cm), minimal feed
 % pressure(psi), brine conductvity(mS), Na2SO4 and CaCl2-H2O needed(g)
 % based on intended feed concentration(mM), batch time(hour), average flux
@@ -21,8 +21,8 @@ brine_membrane_osmotic = 0.1450 * 1.1 * brine_osmotic; % psi, brine osmotic pres
 
 % calculate for batch volume
 avg_osmotic =(feed_membrane_osmotic + brine_membrane_osmotic) / 2; % psi
-min_feed_pres = avg_flux / Kw / 0.06895 + avg_osmotic  ; %psi, minimal hydraulic pressure needed
-avg_flowrate = avg_flux * membrane_area; % L/h
+min_feed_pres = avg_flux / Kw / 0.06895 + avg_osmotic; %psi, minimal hydraulic pressure needed
+avg_flowrate = avg_flux * membrane_area % L/h
 batch_vol = batch_time * avg_flowrate; % L
 brine_vol = batch_vol * (1 - RR); % L
 
@@ -33,6 +33,8 @@ dist_full = Reverse_Tank_Calculation(batch_vol);
 % calculate Na2SO4 and CaCl2-H2O mass
 [grams_CaCl_dihydrate,grams_Na2SO4]= CaSO4_mixing(feed_concn/1000, batch_vol);% inputs: concentration(mol/L)
                                                                               %         volume(L)
+                                                                              % outputs: grams per batch
+
 % calculate conductivities
 brine_conductivity = brine_concn * unit_condu; % mS
 batch_conductivity = feed_concn * unit_condu; % mS
@@ -41,5 +43,7 @@ batch_conductivity = feed_concn * unit_condu; % mS
 batch_number = total_time / batch_time;
 feed_vol = batch_number * batch_vol; % L
 feed_vol_gallon = 0.2642 * feed_vol; % gallon
+tot_CaCl = grams_CaCl_dihydrate * batch_number;
+tot_Na2SO4 = grams_Na2SO4 * batch_number;
 end
 

@@ -63,6 +63,7 @@ end
 % end
 %% Calculation based on data and polynomial equation 
 function h = Reverse_V_trian(volume)
+    disp(volume)
     if volume <= 0
         h = 0;
     else % water level within triangular zone
@@ -72,9 +73,9 @@ function h = Reverse_V_trian(volume)
         TRI_HEIGHT = 11.7; % cm, tank bottom to triangular top
         UPTO_SQUARE_VOL = 48.3403; % cm3, volume up to the bottom of tri zone
         x = TANK_HEIGHT -(SQUARE_HEIGHT + h_trian); % cm,ultrasonic distance
-        total_volume = 18412 - 1384 * x + 26.1 * x^2;
+        total_volume = 19391 - 1498 * x + 29 * x^2;
         tri_volume = total_volume - UPTO_SQUARE_VOL == volume;
-        h = double(vpasolve(tri_volume, h_trian,[0 TRI_HEIGHT-SQUARE_HEIGHT]));
+        h = vpasolve(tri_volume, h_trian,[0 TRI_HEIGHT - SQUARE_HEIGHT]);
     end 
 end
 
