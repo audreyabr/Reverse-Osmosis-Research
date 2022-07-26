@@ -40,83 +40,83 @@ perm_LMHB = flux_lmh ./ (P_bar-pi_bar(1:end-n_av)); %LMH/bar, permeability
 % plots conductivity over time
 figure
 hold on
-plot(time, conductivity)
+plot(time/3600, conductivity)
 title("Conductivity of Water Over Time")
-xlabel("Time, s")
-ylabel("Conductivity, mS/cm")
+xlabel("Time (h)")
+ylabel("Conductivity (mS/cm)")
 hold off
 
 % plots distance over time
 figure
 hold on
-plot(time, distance)
+plot(time/3600, distance)
 title("Water Level Over Time")
-xlabel("Time, s")
-ylabel("Distance, cm")
+xlabel("Time (h)")
+ylabel("Distance (cm)")
 ylim([0,30])
 hold off
 
 % plots flow rate over time
 figure
 hold on
-plot(time, batch_flow_rate)
+plot(time/3600, batch_flow_rate)
 title("Flow Rate of Batch Water Over Time")
-xlabel("Time, s")
-ylabel("Flow Rate, mL/min")
+xlabel("Time (h)")
+ylabel("Flow Rate (mL/min)")
 hold off
 
 % plots flow rate over time
 figure
 hold on
-plot(time, permeate_flow_rate)
+plot(time/3600, permeate_flow_rate)
 title("Flow Rate of Permeate Over Time")
-xlabel("Time, s")
-ylabel("Flow Rate, mL/min")
+xlabel("Time (h)")
+ylabel("Flow Rate (mL/min)")
 hold off
 
 % plots mass over time
 figure
 hold on
-plot(time, mass)
+plot(time/3600, mass)
 title("Mass of Permeate Over Time")
-xlabel("Time, s")
-ylabel("Mass, g")
+xlabel("Time (h)")
+ylabel("Mass (g)")
 hold off
 
 % plots flux
 figure
-plot(time(1:end-n_av), flux_lmh,'o')
+plot(time(1:end-n_av)/3600, flux_lmh)
 title("Flux Over Time")
-xlabel('Time (s)')
+xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([0,200])
+ylim([0,100])
 
 % plots salinity
 figure
-plot(time, sal_mM_av,'o')
+plot(time/3600, sal_mM_av)
 title("Salinity Over Time")
-xlabel('Time (s)')
+xlabel('Time (h)')
 ylabel('Salinity (% CaSO4)')
 
 % plots recover rate
 figure
-plot(time, RR_i_cond,'o')
+plot(time/3600, RR_i_cond)
 title("Recovery Rate")
-xlabel('Time (s)')
+xlabel('Time (h)')
 ylabel('Instantaneous recovery (est.)')
 
 % plots permeability
 figure
-plot(time(1:end-n_av),perm_LMHB,'o')
+plot(time(1:end-n_av)/3600,perm_LMHB)
 title("Membrane Permeability Over Time")
-xlabel('Time (s)')
+xlabel('Time (h)')
 ylabel('Permeability (LMH/bar)')
-ylim([0,10])
+ylim([0,4])
 
 % plots osmotic pressure
 figure
-plot(time,pi_bar,'o')
+plot(time/3600,pi_bar)
 title("Osmotic Pressure Over Time")
-xlabel('Time (s)')
+xlabel('Time (h)')
 ylabel('Osmotic pressure (bar)')
 
