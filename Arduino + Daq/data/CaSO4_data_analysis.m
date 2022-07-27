@@ -11,9 +11,9 @@ mass = permeate_volume_list(1:data_length);                       % mass, g
 
 % calculates and plots salinity ,flux, and permeability
 % parameters to enter each time
-sal_mM_i = 4.6;       % mM, initial salinityfor salinity-based estimation of recovery
-P_psi = 550;          % applied pressure in psi
-permeate_cond = 0.172;  % conductivity of permeate in mS/cm 
+sal_mM_i = 0;       % mM, initial salinityfor salinity-based estimation of recovery
+P_psi = 360;          % applied pressure in psi
+permeate_cond = 7.8/1000;  % conductivity of permeate in mS/cm 
 
 % preset parameters
 t_min_av = 0.5;         % minutes to average over
