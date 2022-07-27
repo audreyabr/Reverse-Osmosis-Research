@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-filename = 'live_data_july25.csv';
+filename = 'live_data_water_july26.csv';
 
 % setup pins 
 trigger_pin= 'D8';
