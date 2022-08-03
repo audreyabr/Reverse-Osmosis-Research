@@ -1,4 +1,4 @@
-function [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, filename)
+function [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,filename,t)
 % main_data_measuring function combines functions including distance_reading,
 % daq_reading, time_readings, integrate_permeate_volume, check_tank_state.
 % It reads data from both Arduino and DAQ, displays current permeate
@@ -17,8 +17,8 @@ function [time_list, distance_list, permeate_flowrate_list, flowrate_list, condu
 %   Every data list saved in the csv file, tank state
 
     [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
-    [permeate_flowrate_list, current_permeate_flowrate, flowrate_list, current_flowrate, conductivity_list, conductivity, tank_state] = daq_reading(dq, permeate_flowrate_list, flowrate_list, conductivity_list);
-    disp("permeate flowrate(mL/min): " + current_permeate_flowrate)
+    [permeate_flowrate_list, permeate_flowrate, flowrate_list, flowrate, conductivity_list, conductivity] = daq_reading(dq, permeate_flowrate_list, flowrate_list, conductivity_list);
+    disp("permeate flowrate(mL/min): " + permeate_flowrate)
     
     % Read time
     time_now = toc(t); 
