@@ -15,9 +15,9 @@ empty_time = time(r);
         
 %% calculates and plots salinity ,flux, and permeability
 % parameters to enter each time
-sal_mM_i = 4.3;       % mM, initial salinityfor salinity-based estimation of recovery
-P_psi = 350;          % applied pressure in psi
-permeate_cond = 100/1000;  % conductivity of permeate in mS/cm 
+sal_mM_i = 0;       % mM, initial salinityfor salinity-based estimation of recovery
+P_psi = 360;          % applied pressure in psi
+permeate_cond = 5/1000;  % conductivity of permeate in mS/cm 
 
 % preset parameters
 t_min_av = 0.5;         % minutes to average over
@@ -124,7 +124,7 @@ xline(empty_time./3600)
 title("Membrane Permeability Over Time")
 xlabel('Time (h)')
 ylabel('Permeability (LMH/bar)')
-ylim([0,4])
+ylim([0,16])
 
 % plots osmotic pressure
 figure
