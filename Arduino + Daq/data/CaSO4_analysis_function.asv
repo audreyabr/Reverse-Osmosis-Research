@@ -1,3 +1,24 @@
+function [flux_lmh,sal_mM_av,RR_i_cond,perm_LMHB,pi_bar] = CaSO4_analysis_function(time_list,conductivity_list,distance_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,sal_mM_i,P_psi,permeate_cond)
+% This function takes in data lists and setting conditions of each test with
+% NaCl and CaSO4. It generates graphs including flux over time, permeability
+% over time, etc. 
+
+% Inputs:
+    % time,conductivity, distance, two flowrates, permeate volume, and tank
+    % state lists
+    % sal_mM_i: mM, initial salinityfor salinity-based estimation of recovery
+    % P_psi: applied pressure in psi
+    % permeate_cond: conductivity of permeate in mS/cm 
+% Output:
+    % flux_lmh: L/m2.h, flux calculated with permeate flowrate
+    % sal_mM_av: mM, salinity of CaSO4 (only) calculated with conductivity
+    % RR_i_cond: instantaneous recovery rate calculated with conductivity
+    % pi_bar: bar, osmotic pressure calculated with linear relation between
+    %         osmotic pressure and concentration.
+    % perm_LMHB: L/m2.h.bar, permeability calculated with flux and osmotic pressure 
+
+
+% Input data
 D = [length(time_list),length(conductivity_list),length(distance_list),length(flowrate_list),length(permeate_flowrate_list),length(permeate_volume_list)];
 data_length = min(D,[],"all");
 
@@ -14,10 +35,6 @@ tank_state = tank_state_list(1:data_length);                      % tank states,
 empty_time = time(r);
         
 %% calculates and plots salinity ,flux, and permeability
-% parameters to enter each time
-sal_mM_i = 4.6;       % mM, initial salinityfor salinity-based estimation of recovery
-P_psi = 550;          % applied pressure in psi
-permeate_cond = 100/1000;  % conductivity of permeate in mS/cm 
 
 % preset parameters
 t_min_av = 0.5;         % minutes to average over
@@ -27,20 +44,25 @@ t_interval = 1;         % NOTE: data time interval is approximate
 A_m = 0.0238;           % m^2, membrane area(SW measurement feed side, 2019 module)
 
 close all
-sal_mM = conductivity / condu_at_1mM;  % mM, salinity calculated by linear relation to conductivity
+sal_mM = conductivity / condu_at_1mM;  % mM, salinity of CaSO4 calculated by linear relation to conductivity
 n_av = t_min_av * 60/t_interval;        % number of points to make flux avg across
 
 sal_mM_av = movmean(sal_mM, n_av);
 flowrate_av = (mass(n_av+1:end) - mass(1:end-n_av)) ./ (time(n_av+1:end) - time(1:end-n_av));
 
+permeate_salinity = permeate_cond / condu_at_1mM; % mM, calculate permeate salinity
+
 flux_lmh = flowrate_av / 1000*3600 / A_m; % L/m2.h
-RR_i_cond = 1 - sal_mM_i ./ sal_mM_av; % conductivity-based instantaneous RR assuming no salt permeation!
+RR_i_cond = 1 - sal_mM_i / sal_mM_av; % conductivity-based instantaneous RR assuming no salt permeation!
 P_bar = P_psi * 0.0689;
-pi_psi = pi_at_1mM * sal_mM_av; % est. osmotic pressure in psi
-pi_bar = pi_psi * 0.01;    
+pi_kpa = pi_at_1mM * sal_mM_av; % est. osmotic pressure in kpa
+pi_bar = pi_kpa * 0.01;    
 perm_LMHB = flux_lmh ./ (P_bar-pi_bar(1:end-n_av)); %LMH/bar, permeability
 
 %% Generate graphs
+
+% Vertical lines at moments that the tank turns empty
+
 % plots conductivity over time
 figure
 hold on
@@ -133,4 +155,6 @@ xline(empty_time./3600)
 title("Osmotic Pressure Over Time")
 xlabel('Time (h)')
 ylabel('Osmotic pressure (bar)')
+
+end
 
