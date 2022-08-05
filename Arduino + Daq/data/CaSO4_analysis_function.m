@@ -1,4 +1,4 @@
-function [flux_lmh,sal_mM_av,RR_i_cond,perm_LMHB,pi_bar] = CaSO4_analysis_function(time_list,conductivity_list,distance_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,sal_mM_i,P_psi,permeate_cond)
+function [] = CaSO4_analysis_function(time_list,conductivity_list,distance_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,sal_mM_i,P_psi)
 % This function takes in data lists and setting conditions of each test with
 % NaCl and CaSO4. It generates graphs including flux over time, permeability
 % over time, etc. 
@@ -29,8 +29,8 @@ distance = distance_list(1:data_length);                          % distance, cm
 batch_flow_rate = flowrate_list(1:data_length);                   % flow rate, mL/min
 permeate_flow_rate = permeate_flowrate_list(1:data_length);       % flow rate, mL/min
 mass = permeate_volume_list(1:data_length);                       % mass, g
-tank_state = tank_state_list(1:data_length);                      % tank states, (0=empty,1=neither,2=full)
 
+tank_state = tank_state_list(1:data_length);                      % tank states, (0=empty,1=neither,2=full)
 [r,c] = find(tank_state == 0);
 empty_time = time(r);
         
@@ -48,12 +48,13 @@ sal_mM = conductivity / condu_at_1mM;  % mM, salinity of CaSO4 calculated by lin
 n_av = t_min_av * 60/t_interval;        % number of points to make flux avg across
 
 sal_mM_av = movmean(sal_mM, n_av);
-flowrate_av = (mass(n_av+1:end) - mass(1:end-n_av)) ./ (time(n_av+1:end) - time(1:end-n_av));
 
-permeate_salinity = permeate_cond / condu_at_1mM; % mM, calculate permeate salinity
+
+flowrate_av = (mass(n_av+1:end) - mass(1:end-n_av)) ./ (time(n_av+1:end) - time(1:end-n_av));
+RR_i_cond = 1 - sal_mM_i ./ sal_mM_av; % conductivity-based instantaneous RR assuming no salt permeation!
+
 
 flux_lmh = flowrate_av / 1000*3600 / A_m; % L/m2.h
-RR_i_cond = 1 - sal_mM_i / sal_mM_av; % conductivity-based instantaneous RR assuming no salt permeation!
 P_bar = P_psi * 0.0689;
 pi_kpa = pi_at_1mM * sal_mM_av; % est. osmotic pressure in kpa
 pi_bar = pi_kpa * 0.01;    
@@ -71,6 +72,7 @@ xline(empty_time./3600)
 title("Conductivity of Water Over Time")
 xlabel("Time (h)")
 ylabel("Conductivity (mS/cm)")
+ylim([0,22])
 hold off
 
 % plots distance over time
@@ -92,6 +94,7 @@ xline(empty_time./3600)
 title("Flow Rate of Batch Water Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
+ylim([0,700])
 hold off
 
 % plots flow rate over time
@@ -102,6 +105,7 @@ xline(empty_time./3600)
 title("Flow Rate of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
+ylim([0,40])
 hold off
 
 % plots mass over time
@@ -121,7 +125,7 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([0,100])
+ylim([0,70])
 
 % plots salinity
 figure
@@ -130,6 +134,7 @@ xline(empty_time./3600)
 title("Salinity Over Time")
 xlabel('Time (h)')
 ylabel('Salinity (mM CaSO4)')
+ylim([0,40])
 
 % plots recover rate
 figure
@@ -138,6 +143,7 @@ xline(empty_time./3600)
 title("Recovery Rate")
 xlabel('Time (h)')
 ylabel('Instantaneous recovery (est.)')
+ylim([-0.5,1])
 
 % plots permeability
 figure
