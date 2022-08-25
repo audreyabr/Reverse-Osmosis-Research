@@ -72,7 +72,7 @@ xline(empty_time./3600)
 title("Conductivity of Water Over Time")
 xlabel("Time (h)")
 ylabel("Conductivity (mS/cm)")
-ylim([0,22])
+ylim([0,10])
 hold off
 
 % plots distance over time
@@ -83,7 +83,7 @@ xline(empty_time./3600)
 title("Water Level Over Time")
 xlabel("Time (h)")
 ylabel("Distance (cm)")
-ylim([0,30])
+ylim([10,27])
 hold off
 
 % plots flow rate over time
@@ -105,7 +105,7 @@ xline(empty_time./3600)
 title("Flow Rate of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
-ylim([0,40])
+ylim([30,80])
 hold off
 
 % plots mass over time
@@ -125,7 +125,7 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([0,70])
+ylim([80,150])
 
 % plots salinity
 figure
@@ -134,7 +134,7 @@ xline(empty_time./3600)
 title("Salinity Over Time")
 xlabel('Time (h)')
 ylabel('Salinity (mM CaSO4)')
-ylim([0,40])
+ylim([0,10])
 
 % plots recover rate
 figure
@@ -143,7 +143,7 @@ xline(empty_time./3600)
 title("Recovery Rate")
 xlabel('Time (h)')
 ylabel('Instantaneous recovery (est.)')
-ylim([-0.5,1])
+ylim([-0.5,1.5])
 
 % plots permeability
 figure
