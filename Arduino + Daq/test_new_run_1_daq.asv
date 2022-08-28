@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-filename = 'live_data_august2-2.csv';
+filename = 'live_data_august26.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -32,8 +32,8 @@ ch02ai.TerminalConfig = 'Differential';
 % constants
 initial_conductivity = input("initial conductivity(mS): ");
 conductivity_buffer = 0.15 * initial_conductivity;
-empty_tank_dist = 16;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 12;  % cm  (CHANGE LATER?)
+empty_tank_dist = 25;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_dist = 20;  % cm  (CHANGE LATER?)
 pause_time = 0.5; % seconds, waiting time between arduino operations
 max_flush_volume = 100; % ml, max amount to be flushed if conductivity does not reset
 max_flush_distance = 26.5; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
@@ -107,30 +107,31 @@ while run == 1
                 pause(pause_time) % valve delay time
                 writeDigitalPin(a,batch_valve_pin,1); % open batch valve
                 pause(pause_time) % valve delay time
-                disp("Stop flushing. Conductivity(mS): " + conductivity_list(end))
+                disp("3-Stop flushing. Conductivity(mS): " + conductivity_list(end))
             end  
         end
         
         % Close feed valve
         writeDigitalPin(a,feed_valve_pin,1);
         pause(pause_time) % valve delay time 
+        disp("4-Stop feeding-tank full")
 
         % If flushing continues after feeding has finished
         if conductivity_list(end) > initial_conductivity + conductivity_buffer
             
             while conductivity_list(end) > initial_conductivity + conductivity_buffer && distance_list(end) <= max_flush_distance
-                disp("Flushing after feeding stops")
+                disp("4.1-Flushing after tank full")
                 
                 % data collections
                 [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, filename);
             end
             
             % stop flushing
-            writeDigitalPin(a,brine_valve_pin,0);  % open brine valve
+            writeDigitalPin(a,brine_valve_pin,1);  % close brine valve
             pause(pause_time) % valve delay time
-            writeDigitalPin(a,batch_valve_pin,0); % close batch valve
+            writeDigitalPin(a,batch_valve_pin,1); % open batch valve
             pause(pause_time) % valve delay time
-            disp("Stop flushing after feeding. Conductivity(mS): " + conductivity_list(end))
+            disp("4.2-Stop flushing after feeding. Conductivity(mS): " + conductivity_list(end))
             
             % Refill the tank if water level is below full distance
             if distance > full_tank_dist + 0.3
@@ -140,12 +141,13 @@ while run == 1
                 
                 % Check final distance
                 while distance > full_tank_dist + 0.3
-                   disp("Re-feeding")
+                   disp("4.3-Refeeding")
                    [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t);
                 end
                 % Close feed valve
                 writeDigitalPin(a,feed_valve_pin,1);
-                pause(pause_time) % valve delay time 
+                pause(pause_time) % valve delay time
+                disp("4.4-Stop feeding-tank full")
             end
         end
         
