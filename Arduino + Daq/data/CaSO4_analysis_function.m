@@ -125,7 +125,7 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([85,120])
+ylim([85,170])
 
 % plots salinity
 figure
