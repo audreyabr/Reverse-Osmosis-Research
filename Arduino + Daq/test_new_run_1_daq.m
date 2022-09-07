@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-filename = 'live_data_sept1.csv';
+filename = 'live_data_sept5.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -12,7 +12,7 @@ feed_valve_pin = 'D5';
 perm_flowrate_pin = 'A2';
 
 % set up Arduino and Ultrasonic sensor
-a = arduino('COM5', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM6', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % set up DAQ
