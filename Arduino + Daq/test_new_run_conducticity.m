@@ -33,7 +33,7 @@ ch02ai.TerminalConfig = 'Differential';
 initial_conductivity = input("initial conductivity(mS): ");
 conductivity_buffer = 0.15 * initial_conductivity;
 empty_tank_dist = 25;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 20;  % cm  (CHANGE LATER?)
+full_tank_dist = 23;  % cm  (CHANGE LATER?)
 pause_time = 0.5; % seconds, waiting time between arduino operations
 max_flush_volume = 100; % ml, max amount to be flushed if conductivity does not reset
 max_flush_distance = 26.5; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
@@ -65,7 +65,7 @@ while run == 1
     [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t);
     
     % tank not empty: maintain normal state
-    if conductivity(end) < end_conductivity
+    if(conductivity_list(end) < end_conductivity)&&(tank_state ~= 0)
         writeDigitalPin(a,batch_valve_pin,1); % open batch valve
         pause(pause_time) % valve delay time
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
@@ -75,7 +75,7 @@ while run == 1
     end
     
     % tank empty: flush -> feed + flush -> feed to full
-    if conductivity(end) >= end_conductivity * (1 - 0.1)
+    if(conductivity_list(end) >= end_conductivity)||tank_state == 0
         
         % flush brine to max low
         if distance_list(end) <= max_flush_distance
