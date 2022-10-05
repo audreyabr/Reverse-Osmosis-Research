@@ -13,7 +13,7 @@ function [grams_CaCl_dihydrate,grams_Na2SO4] = CaSO4_mixing(concentration,volume
     
 
 %Units
-%concentration units = mol/L
+%concentration units = mol/L (M)    
 %volume = Liters(L)
 
 % Parameters
