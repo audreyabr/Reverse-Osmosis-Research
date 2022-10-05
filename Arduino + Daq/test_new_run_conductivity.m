@@ -1,7 +1,7 @@
 % Entire system code - to stop it, do Ctrl+c
 clear
 
-filename = 'compaction_10-2-restart.csv';
+filename = '10-4-data.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -33,8 +33,8 @@ ch02ai.TerminalConfig = 'Differential';
 %initial_conductivity = input("initial conductivity(mS): ");
 end_conductivity = input("batch end conductivity(mS): ");
 
-empty_tank_dist = 13.05;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 10.55;  % cm  (CHANGE LATER?)
+empty_tank_dist = 24.05;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_dist = 19.55;  % cm  (CHANGE LATER?)
 pause_time = 0.5; % seconds, waiting time between arduino operations
 max_flush_distance = 26.5; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
 
