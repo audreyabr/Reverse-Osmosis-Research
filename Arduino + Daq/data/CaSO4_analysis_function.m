@@ -105,7 +105,7 @@ xline(empty_time./3600)
 title("Flow Rate of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
-ylim([30,80])
+ylim([0,30])
 hold off
 
 % plots mass over time
@@ -125,7 +125,7 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([85,170])
+ylim([20,40])
 
 % plots salinity
 figure
@@ -134,7 +134,7 @@ xline(empty_time./3600)
 title("Salinity Over Time")
 xlabel('Time (h)')
 ylabel('Salinity (mM CaSO4)')
-ylim([0,10])
+ylim([0,40])
 
 % plots recover rate
 figure
