@@ -1,4 +1,9 @@
 % Entire system code - to stop it, do Ctrl+c
+
+% feed: 1-close, 0-open
+% brine: 1-close, 0-open
+% batch: 0-close, 1-open
+
 clear
 filename = '10-4-data.csv';
 
@@ -11,13 +16,14 @@ feed_valve_pin = 'D5';
 perm_flowrate_pin = 'A2';
 
 % set up Arduino and Ultrasonic sensor
-a = arduino('COM6', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM16', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % set up DAQ
 daqreset
 d = daqlist;
-dq = daq('ni');
+% dq = daq("ni");
+dq = daqvendorlist;
 Daqtype = d.DeviceID;
 
 ch00ai = addinput(dq,Daqtype,'ai0','Voltage');  % permeate flowrate in Channel AI0(+)
@@ -66,6 +72,10 @@ conductivity_buffer = 0.15 * initial_conductivity;
 %%
 while run == 1
     i = 1;
+    % i is used to indicate if the conductivity is low enough for the next
+    % batch and if during the feed + flush state brine valve has been
+    % closed or not
+    
     disp("Batch Number: " + batch_number)
     
     % data collections
@@ -86,14 +96,14 @@ while run == 1
     if(conductivity_list(end) >= end_conductivity)||tank_state == 0
         
         % flush brine to max low
-        if distance_list(end) <= max_flush_distance
+        if distance_list(end) <= max_flush_distance % if tank level above min level
             % Drain tank water
             writeDigitalPin(a,brine_valve_pin,0);  % open brine valve
             pause(pause_time) % valve delay time
             writeDigitalPin(a,batch_valve_pin,0); % close batch valve
             pause(pause_time) % valve delay time
         
-            while distance_list(end) <= max_flush_distance
+            while distance_list(end) <= max_flush_distance % while tank is above min level
                 disp("1-Flushing")
                 
                 % data collections
@@ -109,15 +119,16 @@ while run == 1
         writeDigitalPin(a,feed_valve_pin,0); % open feed valve
         pause(pause_time) % valve delay time
             
-        while distance_list(end) > full_tank_dist
-            if i == 0
-                disp("3.1-Finished flushing, still feeding")
-            elseif i == 1
+        while distance_list(end) > full_tank_dist % while the tank is not full
+            if i == 1
                 disp("2-Flushing + Feeding")
+            elseif i == 0
+                disp("3.1-Finished flushing, still feeding")
+            
             end 
             % data collections
             [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list,tank_state_list, filename, t);
-            if (conductivity_list(end) <= initial_conductivity + conductivity_buffer) && (i == 1)
+            if (conductivity_list(end) <= initial_conductivity + conductivity_buffer) && (i == 1) % if conductivity is reset and 
                 % Stop flushing when conductivity is reset
                 writeDigitalPin(a,batch_valve_pin,1); % open batch valve
                 pause(pause_time) % valve delay time
@@ -148,16 +159,18 @@ while run == 1
             
             % stop flushing
             writeDigitalPin(a,batch_valve_pin,1); % open batch valve
+            batch_state = true;
             pause(pause_time) % valve delay time
             writeDigitalPin(a,brine_valve_pin,1);  % close brine valve
             pause(pause_time) % valve delay time
             
             disp("4.2-Stop flushing after feeding. Conductivity(mS): " + conductivity_list(end))
+           
             
             % Refill the tank if water level is below full distance
             if distance_list(end) > full_tank_dist + 0.3
                 % Open feed valve
-                writeDigitalPin(a,feed_valve_pin,1);
+                writeDigitalPin(a,feed_valve_pin,0);
                 pause(pause_time) % valve delay time
                 
                 % Check final distance
