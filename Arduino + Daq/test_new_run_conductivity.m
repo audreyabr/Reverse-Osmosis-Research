@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = '10-4-data.csv';
+filename = '10-18-compaction.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -16,14 +16,14 @@ feed_valve_pin = 'D5';
 perm_flowrate_pin = 'A2';
 
 % set up Arduino and Ultrasonic sensor
-a = arduino('COM16', 'Mega2560','Libraries', 'Ultrasonic');
+a = arduino('COM6', 'Mega2560','Libraries', 'Ultrasonic');
 ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
 
 % set up DAQ
 daqreset
 d = daqlist;
-% dq = daq("ni");
-dq = daqvendorlist;
+dq = daq("ni");
+%dq = daqvendorlist;
 Daqtype = d.DeviceID;
 
 ch00ai = addinput(dq,Daqtype,'ai0','Voltage');  % permeate flowrate in Channel AI0(+)
@@ -34,12 +34,12 @@ ch02ai = addinput(dq,Daqtype,'ai2','Voltage');  % conductivity in Channel AI2
 ch02ai.TerminalConfig = 'Differential';
 
 %%
-% constants
+%CONSTANTS
 %initial_conductivity = input("initial conductivity(mS): ");
 end_conductivity = input("batch end conductivity(mS): ");
 
-empty_tank_dist = 24.05;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 19.55;  % cm  (CHANGE LATER?)
+empty_tank_dist = 25.17;  % cm, top of the tank to the top of the drainage square with some extra room
+full_tank_dist = 20.75;  % cm  (CHANGE LATER?)
 pause_time = 0.5; % seconds, waiting time between arduino operations
 max_flush_distance = 26.5; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
 
@@ -159,7 +159,6 @@ while run == 1
             
             % stop flushing
             writeDigitalPin(a,batch_valve_pin,1); % open batch valve
-            batch_state = true;
             pause(pause_time) % valve delay time
             writeDigitalPin(a,brine_valve_pin,1);  % close brine valve
             pause(pause_time) % valve delay time
