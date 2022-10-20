@@ -65,58 +65,58 @@ perm_LMHB = flux_lmh ./ (P_bar-pi_bar(1:end-n_av)); %LMH/bar, permeability
 % Vertical lines at moments that the tank turns empty
 
 % plots conductivity over time
-figure
-hold on
-plot(time/3600, conductivity)
-xline(empty_time./3600)
-title("Conductivity of Water Over Time")
-xlabel("Time (h)")
-ylabel("Conductivity (mS/cm)")
-ylim([0,10])
-hold off
+% figure
+% hold on
+% plot(time/3600, conductivity)
+% xline(empty_time./3600)
+% title("Conductivity of Water Over Time")
+% xlabel("Time (h)")
+% ylabel("Conductivity (mS/cm)")
+% ylim([0,10])
+% hold off
 
 % plots distance over time
-figure
-hold on
-plot(time/3600, distance)
-xline(empty_time./3600)
-title("Water Level Over Time")
-xlabel("Time (h)")
-ylabel("Distance (cm)")
-ylim([10,27])
-hold off
+% figure
+% hold on
+% plot(time/3600, distance)
+% xline(empty_time./3600)
+% title("Water Level Over Time")
+% xlabel("Time (h)")
+% ylabel("Distance (cm)")
+% ylim([10,27])
+% hold off
 
 % plots flow rate over time
-figure
-hold on
-plot(time/3600, batch_flow_rate)
-xline(empty_time./3600)
-title("Flow Rate of Batch Water Over Time")
-xlabel("Time (h)")
-ylabel("Flow Rate (mL/min)")
-ylim([0,700])
-hold off
+% figure
+% hold on
+% plot(time/3600, batch_flow_rate)
+% xline(empty_time./3600)
+% title("Flow Rate of Batch Water Over Time")
+% xlabel("Time (h)")
+% ylabel("Flow Rate (mL/min)")
+% ylim([0,700])
+% hold off
 
 % plots flow rate over time
-figure
-hold on
-plot(time/3600, permeate_flow_rate)
-xline(empty_time./3600)
-title("Flow Rate of Permeate Over Time")
-xlabel("Time (h)")
-ylabel("Flow Rate (mL/min)")
-ylim([0,30])
-hold off
+% figure
+% hold on
+% plot(time/3600, permeate_flow_rate)
+% xline(empty_time./3600)
+% title("Flow Rate of Permeate Over Time")
+% xlabel("Time (h)")
+% ylabel("Flow Rate (mL/min)")
+% ylim([10,50])
+% hold off
 
 % plots mass over time
-figure
-hold on
-plot(time/3600, mass)
-xline(empty_time./3600)
-title("Mass of Permeate Over Time")
-xlabel("Time (h)")
-ylabel("Mass (g)")
-hold off
+% figure
+% hold on
+% plot(time/3600, mass)
+% xline(empty_time./3600)
+% title("Mass of Permeate Over Time")
+% xlabel("Time (h)")
+% ylabel("Mass (g)")
+% hold off
 
 % plots flux
 figure
@@ -125,25 +125,25 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([20,40])
+ylim([20,80])
 
 % plots salinity
-figure
-plot(time/3600, sal_mM_av)
-xline(empty_time./3600)
-title("Salinity Over Time")
-xlabel('Time (h)')
-ylabel('Salinity (mM CaSO4)')
-ylim([0,40])
+% figure
+% plot(time/3600, sal_mM_av)
+% xline(empty_time./3600)
+% title("Salinity Over Time")
+% xlabel('Time (h)')
+% ylabel('Salinity (mM CaSO4)')
+% ylim([0,40])
 
 % plots recover rate
-figure
-plot(time/3600, RR_i_cond)
-xline(empty_time./3600)
-title("Recovery Rate")
-xlabel('Time (h)')
-ylabel('Instantaneous recovery (est.)')
-ylim([-0.5,1.5])
+% figure
+% plot(time/3600, RR_i_cond)
+% xline(empty_time./3600)
+% title("Recovery Rate")
+% xlabel('Time (h)')
+% ylabel('Instantaneous recovery (est.)')
+% ylim([-0.5,1.5])
 
 % plots permeability
 figure
@@ -155,12 +155,12 @@ ylabel('Permeability (LMH/bar)')
 ylim([0,6])
 
 % plots osmotic pressure
-figure
-plot(time/3600,pi_bar)
-xline(empty_time./3600)
-title("Osmotic Pressure Over Time")
-xlabel('Time (h)')
-ylabel('Osmotic pressure (bar)')
+% figure
+% plot(time/3600,pi_bar)
+% xline(empty_time./3600)
+% title("Osmotic Pressure Over Time")
+% xlabel('Time (h)')
+% ylabel('Osmotic pressure (bar)')
 
 end
 
