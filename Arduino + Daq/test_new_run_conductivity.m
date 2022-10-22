@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = '10-18-data0046.csv';
+filename = '10-21-data0046.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -77,7 +77,6 @@ while run == 1
     % closed or not
     
     disp("Batch Number: " + batch_number)
-    
     % data collections
     [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t);
 
