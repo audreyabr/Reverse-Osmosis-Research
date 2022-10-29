@@ -37,7 +37,6 @@ ch02ai.TerminalConfig = 'Differential';
 %CONSTANTS
 %initial_conductivity = input("initial conductivity(mS): ");
 %end_conductivity = input("batch end conductivity(mS): ");
-RR = input("Recovery Rate (decimal): ");
 
 empty_tank_dist = 24.39;  % cm, top of the tank to the top of the drainage square with some extra room
 full_tank_dist = 20;  % cm  (CHANGE LATER?)
@@ -69,7 +68,7 @@ disp("Batch Number: " + batch_number)
 % set initial and end conductivity
 initial_conductivity = conductivity_list(end);% first conductivity reading
 end_conductivity = initial_conductivity * (1/ (1 -RR)); % end conductivity calculated with init_condu and RR
-conductivity_buffer = 0.15 * initial_conductivity; % 15% buffer rate for later batches' initial conductivity
+conductivity_buffer = 0.15 * initial_conductivity; % 15% buffer rate for 
 
 %%
 while run == 1
