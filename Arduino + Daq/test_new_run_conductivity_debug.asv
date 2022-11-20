@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = 'test_debug_code.csv';
+filename = '10-21-data0046.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -32,8 +32,7 @@ ch01ai = addinput(dq,Daqtype,'ai1','Voltage');  % batch flowrate in Channel AI1(
 ch01ai.TerminalConfig = 'Differential';
 ch02ai = addinput(dq,Daqtype,'ai2','Voltage');  % conductivity in Channel AI2
 ch02ai.TerminalConfig = 'Differential';
-ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
-ch03ai.TerminalConfig = 'Differential';
+
 
 %CONSTANTS
 %initial_conductivity = input("initial conductivity(mS): ");
