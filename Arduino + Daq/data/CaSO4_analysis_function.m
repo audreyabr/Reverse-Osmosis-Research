@@ -1,4 +1,4 @@
-function [] = CaSO4_analysis_function(time_list,conductivity_list,distance_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,sal_mM_i,P_psi)
+function [] = CaSO4_analysis_function(time_list,conductivity_list,distance_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,P_psi)
 % This function takes in data lists and setting conditions of each test with
 % NaCl and CaSO4. It generates graphs including flux over time, permeability
 % over time, etc. 
@@ -38,14 +38,20 @@ empty_time = time(r);
 
 % preset parameters
 t_min_av = 0.5;         % minutes to average over
-condu_at_1mM = 0.35;   % mS/cm, conductivity of 1mM of CaSO4 and 2mM of NaCl
+%condu_at_1mM = 0.9796;   % mS/cm, conductivity of 1mM of CaSO4 and 2mM of NaCl
 pi_at_1mM = 14.8729;    % kpa, osmotic pressure of 1mM of CaSO4 and 2mM of NaCl
 t_interval = 1;         % NOTE: data time interval is approximate
 A_m = 0.0238;           % m^2, membrane area(SW measurement feed side, 2019 module)
 
+condu_i = mean(mink(conductivity(2:200), 10));
+sal_M_i = condu_concen_converter(condu_i,"conductivity");
+sal_mM_i = sal_M_i * 1000;
+
 close all
-sal_mM = conductivity / condu_at_1mM;  % mM, salinity of CaSO4 calculated by linear relation to conductivity
-n_av = t_min_av * 60/t_interval;        % number of points to make flux avg across
+%sal_mM = conductivity / condu_at_1mM;  % mM, salinity of CaSO4 calculated by linear relation to conductivity
+sal_M = condu_concen_converter(conductivity, "conductivity"); % conductivity data to concentration in M
+sal_mM = sal_M * 1000; % convert to mM
+n_av = t_min_av * 60/t_interval; % number of points to make flux avg across
 
 sal_mM_av = movmean(sal_mM, n_av);
 
@@ -85,7 +91,7 @@ xlabel("Time (h)")
 ylabel("Distance (cm)")
 ylim([10,27])
 hold off
-
+% 
 % plots flow rate over time
 figure
 hold on

@@ -8,9 +8,9 @@ function [dist_full,dist_empty,batch_vol,brine_vol,brine_concn,min_feed_pres,bat
 % constants
 membrane_area = 0.0238; % m^2 (SW measurement feed side, 2019 module)
 T = 25 + 273.15; % Kelvin, tempareture of water
-flush_tube_volume = 0.10; % L, estimated with current tubing loop (remeasure!)
+flush_tube_volume = 0.30; % L, estimated with current tubing loop (remeasure!)
 Kw= 2.6; %L/m2.h.bar, calculated with BW30-4040 membrane and adjusted based on test data
-unit_condu = 0.3235528;    % mS/cm, conductivity of 1mM of CaSO4 and 2mM of NaCl
+%unit_condu = 0.9796;    % mS/cm, conductivity of 1mM of CaSO4 and 2mM of NaCl
 
 % calculate for minimal hydraulic pressure
 brine_concn = feed_concn / (1 - RR);% mM,concentration of CaSO4 in brine
@@ -36,8 +36,8 @@ dist_full = Reverse_Tank_Calculation(batch_vol);
                                                                               %         volume(L)
                                                                               % outputs: grams per batch
 % calculate conductivities
-brine_conductivity = brine_concn * unit_condu; % mS
-batch_conductivity = feed_concn * unit_condu; % mS
+brine_conductivity = condu_concen_converter(brine_concn,"concentration"); % mS/cm
+batch_conductivity = condu_concen_converter(feed_concn,"concentration"); % mS/cm
 
 % estimate total feed water volume base on initial conditions
 batch_number = total_time / batch_time;
