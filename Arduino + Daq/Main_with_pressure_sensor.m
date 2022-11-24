@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = '10-28-data0048.csv';
+filename = 'test_pressure_transmitter_1';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -15,15 +15,13 @@ brine_valve_pin = 'D3';
 feed_valve_pin = 'D5';
 perm_flowrate_pin = 'A2';
 
-% set up Arduino and Ultrasonic sensor
-a = arduino('COM6', 'Mega2560','Libraries', 'Ultrasonic');
-ultrasonicObj = ultrasonic(a,trigger_pin, echo_pin, 'OutputFormat','double');
+% set up Arduino
+a = arduino('COM6', 'Mega2560');
 
 % set up DAQ
 daqreset
 d = daqlist;
 dq = daq("ni");
-%dq = daqvendorlist;
 Daqtype = d.DeviceID;
 
 ch00ai = addinput(dq,Daqtype,'ai0','Voltage');  % permeate flowrate in Channel AI0(+)
@@ -32,6 +30,8 @@ ch01ai = addinput(dq,Daqtype,'ai1','Voltage');  % batch flowrate in Channel AI1(
 ch01ai.TerminalConfig = 'Differential';
 ch02ai = addinput(dq,Daqtype,'ai2','Voltage');  % conductivity in Channel AI2
 ch02ai.TerminalConfig = 'Differential';
+ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
+ch03ai.TerminalConfig = 'Differential';
 
 %%
 %CONSTANTS
@@ -39,15 +39,15 @@ ch02ai.TerminalConfig = 'Differential';
 %end_conductivity = input("batch end conductivity(mS): ");
 RR = input("Recovery Rate (decimal): ");
 
-empty_tank_dist = 24.39;  % cm, top of the tank to the top of the drainage square with some extra room
-full_tank_dist = 20;  % cm  (CHANGE LATER?)
+empty_tank_volume = 50;
+full_tank_volume = 400;  % mL
 pause_time = 0.5; % seconds, waiting time between arduino operations
-max_flush_distance = 26.5; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
+max_flush_volume = 20; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
 
 
 % initialize
 time_list = [0];
-distance_list = [0];
+tank_volume_list = [0];
 conductivity_list = [0];
 flowrate_list = [0];
 permeate_flowrate_list= [0];
@@ -64,12 +64,14 @@ disp("Batch Number: " + batch_number)
         
 
 % data collections
-[time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t);
+[time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
     
 % set initial and end conductivity
 initial_conductivity = conductivity_list(end);% first conductivity reading
-end_conductivity = initial_conductivity * (1/ (1 -RR)); % end conductivity calculated with init_condu and RR
-conductivity_buffer = 0.15 * initial_conductivity; % 15% buffer rate for later batches' initial conductivity
+initial_concentration = condu_concen_converter(initial_conductivity,"conductivity"); % M (molar)
+end_concentration = initial_concentration * (1/ (1 -RR)); % end concentration calculated with init_condu and RR
+end_conductivity = condu_concen_converter(end_concentration,"concentration"); % mS/cm
+conductivity_buffer = 0.1 * initial_conductivity; % 10% buffer rate for later batches' initial conductivity
 
 %%
 while run == 1
@@ -79,8 +81,9 @@ while run == 1
     % closed or not
     
     disp("Batch Number: " + batch_number)
-    % data collections
-    [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t);
+    
+   % data collections
+    [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
 
 
     % tank not empty: maintain normal state
@@ -97,22 +100,22 @@ while run == 1
     if(conductivity_list(end) >= end_conductivity)||tank_state == 0
         
         % flush brine to max low
-        if distance_list(end) <= max_flush_distance % if tank level above min level
+        if tank_volume_list(end) >= max_flush_volume % if tank level above min level
             % Drain tank water
             writeDigitalPin(a,brine_valve_pin,0);  % open brine valve
             pause(pause_time) % valve delay time
             writeDigitalPin(a,batch_valve_pin,0); % close batch valve
             pause(pause_time) % valve delay time
         
-            while distance_list(end) <= max_flush_distance % while tank is above min level
+            while tank_volume_list(end) >= max_flush_volume % while tank is above min level
                 disp("1-Flushing")
                 
                 % data collections
-                [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,filename,t);
+                [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
             end    
         end
         
-        % Open feed valve, fill the tank to full distance while flushing
+        % Open feed valve, fill the tank to full volume while flushing
         writeDigitalPin(a,brine_valve_pin,0);  % open brine valve
         pause(pause_time) % valve delay time
         writeDigitalPin(a,batch_valve_pin,0); % close batch valve
@@ -120,7 +123,7 @@ while run == 1
         writeDigitalPin(a,feed_valve_pin,0); % open feed valve
         pause(pause_time) % valve delay time
             
-        while distance_list(end) > full_tank_dist % while the tank is not full
+        while tank_volume_list(end) < full_volume % while the tank is not full
             if i == 1
                 disp("2-Flushing + Feeding")
             elseif i == 0
@@ -128,7 +131,8 @@ while run == 1
             
             end 
             % data collections
-            [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list,tank_state_list, filename, t);
+            [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
+            
             if (conductivity_list(end) <= initial_conductivity + conductivity_buffer) && (i == 1) % if conductivity is reset and 
                 % Stop flushing when conductivity is reset
                 writeDigitalPin(a,batch_valve_pin,1); % open batch valve
@@ -151,11 +155,11 @@ while run == 1
             pause(pause_time) % valve delay time
             writeDigitalPin(a,batch_valve_pin,0); % close batch valve
             pause(pause_time) % valve delay time
-            while conductivity_list(end) > initial_conductivity + conductivity_buffer && distance_list(end) <= max_flush_distance
+            while conductivity_list(end) > initial_conductivity + conductivity_buffer && volume_list(end) >= max_flush_volume
                 disp("4.1-Flushing after tank full")
                 
                 % data collections
-                [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,filename,t);
+                [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
             end
             
             % stop flushing
@@ -167,16 +171,17 @@ while run == 1
             disp("4.2-Stop flushing after feeding. Conductivity(mS): " + conductivity_list(end))
            
             
-            % Refill the tank if water level is below full distance
-            if distance_list(end) > full_tank_dist + 0.3
+            % Refill the tank if water level is below full volume
+            if tank_volume_list(end) < full_volume
                 % Open feed valve
                 writeDigitalPin(a,feed_valve_pin,0);
                 pause(pause_time) % valve delay time
                 
-                % Check final distance
-                while distance_list(end) > full_tank_dist + 0.3
+                % Check final volume
+                while tank_volume_list(end) < full_volume
                    disp("4.3-Refeeding")
-                   [time_list, distance_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,tank_state] = main_data_collection(empty_tank_dist, full_tank_dist, time_list, a, ultrasonicObj, distance_list, trigger_pin, echo_pin, dq, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list,filename,t);
+                   % data collections
+                    [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
                 end
                 % Close feed valve
                 writeDigitalPin(a,feed_valve_pin,1);

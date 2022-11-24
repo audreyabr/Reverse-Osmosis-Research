@@ -13,13 +13,13 @@ max_current  = 20; % mA
 min_height = 0; % cm
 max_height = 70.309; % cm
 
-resistance = 1000; % ohm
+resistance = 251; % ohm
 
 % calcutate current through resistor
 current_output = (voltage_output / resistance) * 1000; % mA
 
 % convert current signal to height of tank water level
-water_height = (current_output - min_current) *( (max_height - min_height)/ (max_current - min_current) + min_height;
+water_height = (current_output - min_current) *((max_height - min_height)/ (max_current - min_current))+ min_height; % cm
 
 % rectify negative height
 if water_height < 0

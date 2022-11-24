@@ -10,6 +10,7 @@ distance_list = [];
 [distance_list, distance] = distance_reading(a, ultrasonicObj, distance_list, trigger_pin, echo_pin);
 tank_height = 29.87;
 ultra_distance_from_bottom = tank_height - distance;
+disp(ultra_distance_from_bottom)
 
 % set up DAQ
 daqreset
@@ -38,5 +39,5 @@ for i = 1:index
 end 
 disp(voltage_list);
 water_height = volt_to_height(mean(voltage_list(:,4)));
-disp(mean(voltage_list(:,4)))
+%disp(mean(voltage_list(:,4)));
 disp(water_height)
