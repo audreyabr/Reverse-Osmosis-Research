@@ -1,10 +1,8 @@
 function [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_flowrate, conductivity_list, conductivity, volume_list] = daq_reading(daqName, permeate_flowrate_list, batch_flowrate_list, conductivity_list,volume_list)
-%it read this before: function [voltage_list, permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_flowrate, conductivity_list, conductivity] = daq_reading(daqName, permeate_flowrate_list, batch_flowrate_list, conductivity_list)
 
     % Initialize 
     index = 25;
     voltage_list = [];
-    conductivity_voltage_list_rmo = [];
 
     % taking multiple readings from each input pin
     for i = 1:index

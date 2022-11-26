@@ -7,13 +7,13 @@ function tank_state = pres_check_tank_state(empty_tank_volume,full_tank_volume,v
 %
 % Returns:
 %     tank_state: 0 if the batch tank is empty, 2 if the batch is full,
-%                 1 if it is neither. 
+%                 1 if neither. 
 
-if volume_list(end) >= empty_tank_volume
+if volume_list(end) <= empty_tank_volume
     tank_state = 0;
     disp("TANK IS EMPTY...feed valve open")
     
-elseif volume_list(end) <= full_tank_volume
+elseif volume_list(end) >= full_tank_volume
     tank_state = 2;
     disp("TANK IS FULL...close feed valve ")
     

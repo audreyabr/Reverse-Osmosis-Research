@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = 'test_pressure_transmitter_1';
+filename = '11-25-data0048.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -35,14 +35,11 @@ ch03ai.TerminalConfig = 'Differential';
 
 %%
 %CONSTANTS
-%initial_conductivity = input("initial conductivity(mS): ");
-%end_conductivity = input("batch end conductivity(mS): ");
-RR = input("Recovery Rate (decimal): ");
-
-empty_tank_volume = 50;
-full_tank_volume = 400;  % mL
+RR = 0.8;
+empty_tank_volume = 35.5; % mL
+full_tank_volume = 2677.5;  % mL
 pause_time = 0.5; % seconds, waiting time between arduino operations
-max_flush_volume = 20; % cm, ultrasonic sensor measurement of tank waterline that stops flushing
+max_flush_volume = 30; % mL,pressure sensor measurement of tank volume that stops flushing
 
 
 % initialize
@@ -53,9 +50,8 @@ flowrate_list = [0];
 permeate_flowrate_list= [0];
 permeate_volume_list = [0];
 flushed_volume_list = [0];
-batch_number = 1;
 tank_state_list = [0];
-
+batch_number = 1;
 
 % main code 
 run = 1;
@@ -71,7 +67,7 @@ initial_conductivity = conductivity_list(end);% first conductivity reading
 initial_concentration = condu_concen_converter(initial_conductivity,"conductivity"); % M (molar)
 end_concentration = initial_concentration * (1/ (1 -RR)); % end concentration calculated with init_condu and RR
 end_conductivity = condu_concen_converter(end_concentration,"concentration"); % mS/cm
-conductivity_buffer = 0.1 * initial_conductivity; % 10% buffer rate for later batches' initial conductivity
+conductivity_buffer = 0.15 * initial_conductivity; % 10% buffer rate for later batches' initial conductivity
 
 %%
 while run == 1
@@ -87,7 +83,7 @@ while run == 1
 
 
     % tank not empty: maintain normal state
-    if(conductivity_list(end) < end_conductivity)&&(tank_state ~= 0)
+    if(conductivity_list(end) < end_conductivity)&&(tank_state_list(end) ~= 0)
         writeDigitalPin(a,batch_valve_pin,1); % open batch valve
         pause(pause_time) % valve delay time
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
@@ -97,7 +93,7 @@ while run == 1
     end
     
     % tank empty: flush -> feed + flush -> feed to full
-    if(conductivity_list(end) >= end_conductivity)||tank_state == 0
+    if(conductivity_list(end) >= end_conductivity)||tank_state_list(end) == 0
         
         % flush brine to max low
         if tank_volume_list(end) >= max_flush_volume % if tank level above min level
@@ -123,7 +119,7 @@ while run == 1
         writeDigitalPin(a,feed_valve_pin,0); % open feed valve
         pause(pause_time) % valve delay time
             
-        while tank_volume_list(end) < full_volume % while the tank is not full
+        while tank_volume_list(end) < full_tank_volume % while the tank is not full
             if i == 1
                 disp("2-Flushing + Feeding")
             elseif i == 0
@@ -155,7 +151,7 @@ while run == 1
             pause(pause_time) % valve delay time
             writeDigitalPin(a,batch_valve_pin,0); % close batch valve
             pause(pause_time) % valve delay time
-            while conductivity_list(end) > initial_conductivity + conductivity_buffer && volume_list(end) >= max_flush_volume
+            while conductivity_list(end) > initial_conductivity + conductivity_buffer && tank_volume_list(end) >= max_flush_volume
                 disp("4.1-Flushing after tank full")
                 
                 % data collections
@@ -172,13 +168,13 @@ while run == 1
            
             
             % Refill the tank if water level is below full volume
-            if tank_volume_list(end) < full_volume
+            if tank_volume_list(end) < full_tank_volume
                 % Open feed valve
                 writeDigitalPin(a,feed_valve_pin,0);
                 pause(pause_time) % valve delay time
                 
                 % Check final volume
-                while tank_volume_list(end) < full_volume
+                while tank_volume_list(end) < full_tank_volume
                    disp("4.3-Refeeding")
                    % data collections
                     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);

@@ -4,7 +4,7 @@ function volume = height_to_volume(height)
 % (not including water volume in the loop)
 
 % convert height measured by pressure sensor to tank water height
-BOTTOM_TO_SENSOR = 5.5  ; %cm, distance between sensor and tank bottom
+BOTTOM_TO_SENSOR = 5.5; %cm, distance between sensor and tank bottom
 tank_height = height - BOTTOM_TO_SENSOR; %cm, water height IN the tank
 
 % constants (from tank CAD datasheet)
