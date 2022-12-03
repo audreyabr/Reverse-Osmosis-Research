@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = 'test_pres_with_10uF.csv';
+filename = 'test_pres_with_0.1uF.csv';
 
 % setup pins 
 trigger_pin= 'D8';
