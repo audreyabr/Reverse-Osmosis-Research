@@ -41,7 +41,7 @@ pi_at_1mM = 14.8729;    % kpa, osmotic pressure of 1mM of CaSO4 and 2mM of NaCl
 t_interval = 1;         % NOTE: data time interval is approximate
 A_m = 0.0238;           % m^2, membrane area(SW measurement feed side, 2019 module)
 
-condu_i = mean(mink(conductivity(2:200), 10));
+condu_i = mean(mink(conductivity(2:10), 10));
 sal_M_i = condu_concen_converter(condu_i,"conductivity");
 sal_mM_i = sal_M_i * 1000;
 
@@ -81,12 +81,12 @@ hold off
 % plots tank volume over time
 figure
 hold on
-plot(time/3600, tank_volume)
+plot(time/3600, tank_volume,"r*")
 xline(empty_time./3600)
 title("Tank Volume Over Time")
 xlabel("Time (h)")
 ylabel("Volume (mL)")
-ylim([0,5000])
+ylim([0,10000])
 hold off
 % 
 % plots flow rate over time
