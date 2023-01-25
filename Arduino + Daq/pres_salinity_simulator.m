@@ -2,8 +2,7 @@ function [tank_empty_vol,tank_full_vol,batch_vol,brine_vol,brine_concn,min_feed_
 % calculate batch volume(L), volume of full and empty(cm), minimal feed
 % pressure(psi), brine conductvity(mS), Na2SO4 and CaCl2-H2O needed(g)
 % based on intended feed concentration(mM), batch time(hour), average
-% flux
-% (L/m2.h) and recovery rate(%)
+% flux(L/m2.h) and recovery rate(%)
 
 % constants
 membrane_area = 0.0238; % m^2 (SW measurement feed side, 2019 module)
