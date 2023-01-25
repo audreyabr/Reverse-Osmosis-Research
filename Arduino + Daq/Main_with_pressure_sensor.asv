@@ -37,7 +37,7 @@ ch03ai.TerminalConfig = 'Differential';
 %CONSTANTS
 RR = 0.8;
 empty_tank_volume = 35.5; % mL
-full_tank_volume = 1500.5;  % mL
+full_tank_volume = 1.5;  % mL
 pause_time = 0.5; % seconds, waiting time between arduino operations
 max_flush_volume = 30; % mL,pressure sensor measurement of tank volume that stops flushing
 
