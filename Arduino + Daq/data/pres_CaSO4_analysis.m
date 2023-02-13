@@ -75,7 +75,7 @@ xline(empty_time./3600)
 title("Conductivity of Water Over Time")
 xlabel("Time (h)")
 ylabel("Conductivity (mS/cm)")
-ylim([0,10])
+ylim([0,25])
 hold off
 
 % plots tank volume over time
@@ -108,7 +108,7 @@ xline(empty_time./3600)
 title("Flow Rate of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
-ylim([3,75])
+ylim([-1 15])
 hold off
 
 % plots mass over time
@@ -128,7 +128,7 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([0,3])
+%ylim([0,3])
 
 % plots salinity
 figure
