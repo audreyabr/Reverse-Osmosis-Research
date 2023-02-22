@@ -137,7 +137,7 @@ xline(empty_time./3600)
 title("Salinity Over Time")
 xlabel('Time (h)')
 ylabel('Salinity (mM CaSO4)')
-ylim([0,40])
+ylim([0,55])
 
 % plots recover rate
 figure
