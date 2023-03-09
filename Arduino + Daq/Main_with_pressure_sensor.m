@@ -78,7 +78,7 @@ while run == 1
     
     disp("Batch Number: " + batch_number)
     
-   % data collections
+    % data collections
     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
 
     disp(conductivity_list(end))
@@ -188,6 +188,12 @@ while run == 1
                 disp("4.4-Stop feeding-tank full")
                  disp(conductivity_list(end))
             end
+        end
+
+        % email if something breaks
+    
+        if mean(flowrate_list(end-10:end)) < 50
+            sendmail({'aabraham@olin.edu'},['tank is empty']);
         end
         
         % Display current batch number
