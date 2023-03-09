@@ -199,7 +199,9 @@ while run == 1
     end 
 
     % email if something breaks
-    if mean(flowrate_list(end-10:end)) < 50
+    if len(flowrate_list) > 10
+        if mean(flowrate_list(end-10:end)) < 50
             sendmail({'aabraham@olin.edu'},['system is dry']);
+        end
     end
 end 
