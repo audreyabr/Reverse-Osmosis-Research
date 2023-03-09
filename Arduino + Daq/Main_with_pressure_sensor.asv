@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = '3-08-test.csv';
+filename = '3-08-compaction.csv';
 
 % setup pins 
 trigger_pin= 'D8';
