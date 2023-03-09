@@ -33,6 +33,9 @@ ch02ai.TerminalConfig = 'Differential';
 ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
 ch03ai.TerminalConfig = 'Differential';
 
+% email set up
+setpref('Internet','E_mail','aabraham@olin.edu');
+
 %%
 %CONSTANTS
 RR = 0.8;
@@ -189,15 +192,14 @@ while run == 1
                  disp(conductivity_list(end))
             end
         end
-
-        % email if something breaks
-    
-        if mean(flowrate_list(end-10:end)) < 50
-            sendmail({'aabraham@olin.edu'},['tank is empty']);
-        end
         
         % Display current batch number
         batch_number = batch_number + 1;
         disp("Batch Number: " + batch_number)
     end 
+
+    % email if something breaks
+    if mean(flowrate_list(end-10:end)) < 50
+            sendmail({'aabraham@olin.edu'},['system is dry']);
+    end
 end 
