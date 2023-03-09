@@ -34,7 +34,10 @@ ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
 ch03ai.TerminalConfig = 'Differential';
 
 % email set up
+setpref('Internet','SMTP_Server','smpt@gmail.com');
 setpref('Internet','E_mail','aabraham@olin.edu');
+props = java.lang.System.getProperties;
+props.setProperty('mail.smtp.stattls.enable','true');
 
 %%
 %CONSTANTS
@@ -199,7 +202,7 @@ while run == 1
     end 
 
     % email if something breaks
-    if len(flowrate_list) > 10
+    if length(flowrate_list) > 10
         if mean(flowrate_list(end-10:end)) < 50
             sendmail({'aabraham@olin.edu'},['system is dry']);
         end
