@@ -39,7 +39,9 @@ setpref('Internet','E_mail','aabraham@olin.edu');
 setpref('Internet','SMTP_Username','aabraham@olin.edu');
 setpref('Internet','SMTP_Password','');
 props = java.lang.System.getProperties;
-props.setProperty('mail.smtp.stattls.enable','true');
+props.setProperty('mail.smtp.auth','true');
+props.setProperty('mail.smtp.socketFactory.class', 'javax.net.ssl.SSLSocketFactory');
+props.setProperty('mail.smtp.socketFactory.port','465');
 
 %%
 %CONSTANTS
