@@ -34,14 +34,17 @@ ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
 ch03ai.TerminalConfig = 'Differential';
 
 % email set up
-setpref('Internet','SMTP_Server','smpt.gmail.com');
-setpref('Internet','E_mail','aabraham@olin.edu');
-setpref('Internet','SMTP_Username','aabraham@olin.edu');
+setpref('Internet','SMTP_Server','smtp.gmail.com');
+setpref('Internet','E_mail','');
+setpref('Internet','SMTP_Username','');
 setpref('Internet','SMTP_Password','');
 props = java.lang.System.getProperties;
 props.setProperty('mail.smtp.auth','true');
 props.setProperty('mail.smtp.socketFactory.class', 'javax.net.ssl.SSLSocketFactory');
-props.setProperty('mail.smtp.socketFactory.port','465');
+props.setProperty('mail.smtp.socketFactory.port','465'); % or 587?
+
+% props.setProperty('mail.smtp.starttls.enable', 'true' );
+% props.remove('mail.smtp.socketFactory.class')
 
 %%
 %CONSTANTS
@@ -206,9 +209,11 @@ while run == 1
     end 
 
     % email if something breaks
+    disp(flowrate_list(end))
     if length(flowrate_list) > 10
         if mean(flowrate_list(end-10:end)) < 50
-            sendmail({'aabraham@olin.edu'},['system is dry']);
+            sendmail({'aabraham@olin.edu'},'system is dry');
+            disp('email works?')
         end
     end
 end 
