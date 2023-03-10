@@ -34,8 +34,10 @@ ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
 ch03ai.TerminalConfig = 'Differential';
 
 % email set up
-setpref('Internet','SMTP_Server','smpt@gmail.com');
+setpref('Internet','SMTP_Server','smpt.gmail.com');
 setpref('Internet','E_mail','aabraham@olin.edu');
+setpref('Internet','SMTP_Username','aabraham@olin.edu');
+setpref('Internet','SMTP_Password','');
 props = java.lang.System.getProperties;
 props.setProperty('mail.smtp.stattls.enable','true');
 
