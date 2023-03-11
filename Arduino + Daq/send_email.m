@@ -19,7 +19,7 @@ function [email] = send_email(flowrate_list,email)
             mail.Subject = 'system is dry';
             mail.To = 'aabraham@olin.edu';
             mail.BodyFormat = 'olFormatHTML';
-            mail.HTMLBody = [mean(flowrate_list(end-10:end)), 'mL/min'];
+            mail.HTMLBody = [num2str(mean(flowrate_list(end-10:end))), ' mL/min'];
         
             % send message and release object
             mail.Send;

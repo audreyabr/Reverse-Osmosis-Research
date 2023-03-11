@@ -16,7 +16,7 @@ feed_valve_pin = 'D5';
 perm_flowrate_pin = 'A2';
 
 % set up Arduino
-a = arduino('COM6', 'Mega2560');
+a = arduino('COM6', 'Mega2560'); % COM6 for lab laptop
 
 % set up DAQ
 daqreset
@@ -62,7 +62,10 @@ disp("Batch Number: " + batch_number)
 
 % data collections
 [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
-    
+
+% email if something breaks
+[email] = send_email(flowrate_list, email);
+
 % set initial and end conductivity
 initial_conductivity = conductivity_list(end);% first conductivity reading
 initial_concentration = condu_concen_converter(initial_conductivity,"conductivity"); % M (molar)
@@ -82,6 +85,9 @@ while run == 1
     % data collections
     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
 
+    % email if something breaks
+    [email] = send_email(flowrate_list, email);
+    
     disp(conductivity_list(end))
     % tank not empty: maintain normal state
     if(conductivity_list(end) < end_conductivity)&&(tank_state_list(end) ~= 0)
