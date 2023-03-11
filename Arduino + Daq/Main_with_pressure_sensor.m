@@ -110,6 +110,9 @@ while run == 1
                  disp(conductivity_list(end))
                 % data collections
                 [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
+
+                % email if something breaks
+                [email] = send_email(flowrate_list, email);
             end    
         end
         
@@ -131,6 +134,9 @@ while run == 1
             end 
             % data collections
             [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
+
+            % email if something breaks
+            [email] = send_email(flowrate_list, email);
             
             if (conductivity_list(end) <= initial_conductivity + conductivity_buffer) && (i == 1) % if conductivity is reset and 
                 % Stop flushing when conductivity is reset
@@ -159,6 +165,9 @@ while run == 1
                  disp(conductivity_list(end))
                 % data collections
                 [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
+
+                % email if something breaks
+                [email] = send_email(flowrate_list, email);
             end
             
             % stop flushing
@@ -168,7 +177,7 @@ while run == 1
             pause(pause_time) % valve delay time
             
             disp("4.2-Stop flushing after feeding. Conductivity(mS): " + conductivity_list(end))
-           disp(conductivity_list(end))
+            disp(conductivity_list(end))
             
             % Refill the tank if water level is below full volume
             if tank_volume_list(end) < full_tank_volume
@@ -180,14 +189,17 @@ while run == 1
                 while tank_volume_list(end) < full_tank_volume
                    disp("4.3-Refeeding")
                     disp(conductivity_list(end))
-                   % data collections
+                    % data collections
                     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
+
+                    % email if something breaks
+                    [email] = send_email(flowrate_list, email);     
                 end
                 % Close feed valve
                 writeDigitalPin(a,feed_valve_pin,1);
                 pause(pause_time) % valve delay time
                 disp("4.4-Stop feeding-tank full")
-                 disp(conductivity_list(end))
+                disp(conductivity_list(end))
             end
         end
         
@@ -196,23 +208,4 @@ while run == 1
         disp("Batch Number: " + batch_number)
     end 
 
-    % email if something breaks
-    disp(flowrate_list(end))
-    if length(flowrate_list) > 10 && email == 0
-        if mean(flowrate_list(end-10:end)) < 50 
-            email = 1;
-
-            % email set up
-            h = actxserver('outlook.Application');
-            mail = h.CreateItem('olMail');
-            mail.Subject = 'system is dry';
-            mail.To = 'aabraham@olin.edu';
-            mail.BodyFormat = 'olFormatHTML';
-            mail.HTMLBody = [mean(flowrate_list(end-10:end)), 'mL/min'];
-
-            % send message and release object
-            mail.Send;
-            h.release;
-        end
-    end
 end 
