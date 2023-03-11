@@ -33,19 +33,6 @@ ch02ai.TerminalConfig = 'Differential';
 ch03ai = addinput(dq,Daqtype,'ai3','Voltage');  % pressure in Channel AI3
 ch03ai.TerminalConfig = 'Differential';
 
-% email set up
-setpref('Internet','SMTP_Server','smtp.gmail.com');
-setpref('Internet','E_mail','');
-setpref('Internet','SMTP_Username','');
-setpref('Internet','SMTP_Password','');
-props = java.lang.System.getProperties;
-props.setProperty('mail.smtp.auth','true');
-props.setProperty('mail.smtp.socketFactory.class', 'javax.net.ssl.SSLSocketFactory');
-props.setProperty('mail.smtp.socketFactory.port','465'); % or 587?
-
-% props.setProperty('mail.smtp.starttls.enable', 'true' );
-% props.remove('mail.smtp.socketFactory.class')
-
 %%
 %CONSTANTS
 RR = 0.8;
@@ -65,6 +52,7 @@ permeate_volume_list = [0];
 flushed_volume_list = [0];
 tank_state_list = [0];
 batch_number = 1;
+email = 0;
 
 % main code 
 run = 1;
@@ -210,10 +198,21 @@ while run == 1
 
     % email if something breaks
     disp(flowrate_list(end))
-    if length(flowrate_list) > 10
-        if mean(flowrate_list(end-10:end)) < 50
-            sendmail({'aabraham@olin.edu'},'system is dry');
-            disp('email works?')
+    if length(flowrate_list) > 10 && email == 0
+        if mean(flowrate_list(end-10:end)) < 50 
+            email = 1;
+
+            % email set up
+            h = actxserver('outlook.Application');
+            mail = h.CreateItem('olMail');
+            mail.Subject = 'system is dry';
+            mail.To = 'aabraham@olin.edu';
+            mail.BodyFormat = 'olFormatHTML';
+            mail.HTMLBody = [mean(flowrate_list(end-10:end)), 'mL/min'];
+
+            % send message and release object
+            mail.Send;
+            h.release;
         end
     end
 end 
