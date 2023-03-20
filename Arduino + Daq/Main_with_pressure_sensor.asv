@@ -36,11 +36,11 @@ ch03ai.TerminalConfig = 'Differential';
 %%
 %CONSTANTS
 RR = 0.8;
-empty_tank_volume = 3690; % mL
-full_tank_volume = 3800;  % mL
+empty_tank_volume = 2000; % mL
+full_tank_volume = 2677.5;  % mL
 pause_time = 0.5; % seconds, waiting time between arduino operations
-max_flush_volume = 3660; % mL,pressure sensor measurement of tank volume that stops flushing
-end_concentration = 0.023; % M (molar!)
+max_flush_volume = 30; % mL,pressure sensor measurement of tank volume that stops flushing
+end_concentration = 0.023; % M 
 
 
 % initialize
@@ -72,7 +72,7 @@ initial_conductivity = conductivity_list(end);% first conductivity reading
 initial_concentration = condu_concen_converter(initial_conductivity,"conductivity"); % M (molar)
 % end_concentration = initial_concentration * (1/ (1 -RR)); % end concentration calculated with init_condu and RR
 end_conductivity = condu_concen_converter(end_concentration,"concentration"); % mS/cm
-conductivity_buffer = 0.1 * initial_conductivity; % 10% buffer rate for later batches' initial conductivity
+conductivity_buffer = 0.15 * initial_conductivity; % 10% buffer rate for later batches' initial conductivity
 
 %%
 while run == 1
@@ -82,7 +82,6 @@ while run == 1
     % closed or not
     
     disp("Batch Number: " + batch_number)
-    disp("tank vol = " + tank_volume_list(end))
     
     % data collections
     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
