@@ -1,4 +1,4 @@
-function [] = pres_CaSO4_analysis(time_list,conductivity_list,tank_volume_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,P_psi)
+function[] = pres_CaSO4_analysis(time_list,conductivity_list,tank_volume_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,P_psi)
 % This function takes in data lists and setting conditions of each test with
 % NaCl and CaSO4. It generates graphs including flux over time, permeability
 % over time, etc. 
