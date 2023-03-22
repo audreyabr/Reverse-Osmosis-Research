@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = '3-08-test.csv';
+filename = '3-21-test.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -36,11 +36,11 @@ ch03ai.TerminalConfig = 'Differential';
 %%
 %CONSTANTS
 RR = 0.8;
-empty_tank_volume = 3690; % mL
-full_tank_volume = 3800;  % mL
+empty_tank_volume = 169.375; % mL
+full_tank_volume = 1388.8;  % mL
 pause_time = 0.5; % seconds, waiting time between arduino operations
-max_flush_volume = 3660; % mL,pressure sensor measurement of tank volume that stops flushing
-end_concentration = 0.023; % M (molar!)
+max_flush_volume = 80; % mL,pressure sensor measurement of tank volume that stops flushing
+end_concentration = 0.020; % M (molar!)
 
 
 % initialize
@@ -83,6 +83,7 @@ while run == 1
     
     disp("Batch Number: " + batch_number)
     disp("tank vol = " + tank_volume_list(end))
+    disp("condu = " + conductivity_list(end))
     
     % data collections
     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);

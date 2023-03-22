@@ -1,9 +1,11 @@
-function [tank_empty_vol,tank_full_vol,batch_vol,brine_vol,brine_concn,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4,feed_vol_gallon,batch_number, tot_Na2SO4, tot_CaCl, ini_flowrate_ml_min] = pres_salinity_simulator(feed_concn,batch_time,RR,ini_flux,total_time)
+function [feed_concentration,batch_time, tank_empty_vol,tank_full_vol,batch_vol,brine_vol,brine_concn,min_feed_pres,batch_conductivity,brine_conductivity,grams_CaCl_dihydrate,grams_Na2SO4,feed_vol_gallon,batch_number, tot_Na2SO4, tot_CaCl, ini_flowrate_ml_min] = pres_salinity_simulator(feed_concn,batch_time,RR,ini_flux,total_time)
 % calculate batch volume(L), volume of full and empty(cm), minimal feed
 % pressure(psi), brine conductvity(mS), Na2SO4 and CaCl2-H2O needed(g)
 % based on intended feed concentration(mM), batch time(hour), average
 % flux(L/m2.h) and recovery rate(%)
 
+feed_concentration = feed_concn;
+batch_time = batch_time;
 % constants
 membrane_area = 0.0238; % m^2 (SW measurement feed side, 2019 module)
 T = 25 + 273.15; % Kelvin, tempareture of water
