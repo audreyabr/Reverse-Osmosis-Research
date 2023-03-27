@@ -1,10 +1,11 @@
-function [] = Copy_of_pres_CaSO4_analysis(time_list,conductivity_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,P_psi)
+function[] = ini_CaSO4_analysis(time_list2, conductivity_list2,tank_volume_list2, flowrate_list2,permeate_flowrate_list2, permeate_volume_list2, tank_state_list2,P_psi)
 % This function takes in data lists and setting conditions of each test with
-% NaCl and CaSO4. It generates graphs including flux over time, permeability
+% NaCl and CaSO4. It generates graphs including flux over time,
+% permeability
 % over time, etc. 
 
 % Inputs:
-    % time,conductivity, tank volume, two flowrates, permeate volume, and tank
+    % time(sec),conductivity(mS/cm), tank volume(mL), two flowrates(mL/min), permeate volume(mL), and tank
     % state lists
     % P_psi: applied pressure in psi
     % permeate_cond: conductivity of permeate in mS/cm 
@@ -15,21 +16,20 @@ function [] = Copy_of_pres_CaSO4_analysis(time_list,conductivity_list,flowrate_l
     % pi_bar: bar, osmotic pressure calculated with linear relation between
     %         osmotic pressure and concentration.
     % perm_LMHB: L/m2.h.bar, permeability calculated with flux and osmotic pressure 
-
-
+    
 % Input data
-D = [length(time_list),length(conductivity_list),length(flowrate_list),length(permeate_flowrate_list),length(permeate_volume_list)];
-data_length = min(D,[],"all");
+D = [length(time_list2),length(conductivity_list2),length(tank_volume_list2),length(flowrate_list2),length(permeate_flowrate_list2),length(permeate_volume_list2)];
+data_length = (min(D,[],"all")-1);
 
 % assigning variables
-time = time_list(1:data_length);                                  % time, seconds
-conductivity = conductivity_list(1:data_length);                  % conductivity, mS/cm
-% tank_volume = tank_volume_list(1:data_length);                          % distance, cm
-batch_flow_rate = flowrate_list(1:data_length);                   % flow rate, mL/min
-permeate_flow_rate = permeate_flowrate_list(1:data_length);       % flow rate, mL/min
-mass = permeate_volume_list(1:data_length);                       % mass, g
+time = time_list2(1:data_length);                                  % time, seconds
+conductivity = conductivity_list2(1:data_length);                  % conductivity, mS/cm
+tank_volume = tank_volume_list2(1:data_length);                          % distance, cm
+batch_flow_rate = flowrate_list2(1:data_length);                   % flow rate, mL/min
+permeate_flow_rate = permeate_flowrate_list2(1:data_length);       % flow rate, mL/min
+mass = permeate_volume_list2(1:data_length);                       % mass, g
 
-tank_state = tank_state_list(1:data_length);                      % tank states, (0=empty,1=neither,2=full)
+tank_state = tank_state_list2(1:data_length);                      % tank states, (0=empty,1=neither,2=full)
 [r,c] = find(tank_state == 0);
 empty_time = time(r);
         
@@ -57,7 +57,7 @@ flowrate_av = (mass(n_av+1:end) - mass(1:end-n_av)) ./ (time(n_av+1:end) - time(
 RR_i_cond = 1 - sal_mM_i ./ sal_mM_av; % conductivity-based instantaneous RR assuming no salt permeation!
 
 
-flux_lmh = flowrate_av / 1000*3600 / A_m; % L/m2.h
+flux_lmh = ((flowrate_av / 1000)*3600 )/ A_m; % L/m2.h
 P_bar = P_psi * 0.0689;
 pi_kpa = pi_at_1mM * sal_mM_av; % est. osmotic pressure in kpa
 pi_bar = pi_kpa * 0.01;    
@@ -71,51 +71,51 @@ perm_LMHB = flux_lmh ./ (P_bar-pi_bar(1:end-n_av)); %LMH/bar, permeability
 figure
 hold on
 plot(time/3600, conductivity)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Conductivity of Water Over Time")
 xlabel("Time (h)")
 ylabel("Conductivity (mS/cm)")
-ylim([0,10])
+ylim([0,25])
 hold off
 
-% % plots tank volume over time
-% figure
-% hold on
-% plot(time/3600, tank_volume,"r*")
-% xline(empty_time./3600)
-% title("Tank Volume Over Time")
-% xlabel("Time (h)")
-% ylabel("Volume (mL)")
-% ylim([0,10000])
-% hold off
+% plots tank volume over time
+figure
+hold on
+plot(time/3600, tank_volume,"r*")
+%xline(empty_time./3600)
+title("Tank Volume Over Time")
+xlabel("Time (h)")
+ylabel("Volume (mL)")
+ylim([0,10000])
+hold off
 % 
 % plots flow rate over time
 figure
 hold on
 plot(time/3600, batch_flow_rate)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Flow Rate of Batch Water Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
 ylim([0,700])
 hold off
 
-% plots flow rate over time
+% plots permeate flow rate over time
 figure
 hold on
 plot(time/3600, permeate_flow_rate)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Flow Rate of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
-ylim([3,75])
+ylim([-1 15])
 hold off
 
 % plots mass over time
 figure
 hold on
 plot(time/3600, mass)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Mass of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Mass (g)")
@@ -124,43 +124,43 @@ hold off
 % plots flux
 figure
 plot(time(1:end-n_av)/3600, flux_lmh)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([20,140])
+%ylim([0,3])
 
-% % plots salinity
-% figure
-% plot(time/3600, sal_mM_av)
-% xline(empty_time./3600)
-% title("Salinity Over Time")
-% xlabel('Time (h)')
-% ylabel('Salinity (mM CaSO4)')
-% ylim([0,40])
+% plots salinity
+figure
+plot(time/3600, sal_mM_av)
+%xline(empty_time./3600)
+title("Salinity Over Time")
+xlabel('Time (h)')
+ylabel('Salinity (mM CaSO4)')
+ylim([0,55])
 
 % plots recover rate
 figure
 plot(time/3600, RR_i_cond)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Recovery Rate")
 xlabel('Time (h)')
 ylabel('Instantaneous recovery (est.)')
-ylim([-0.5,1.5])
+ylim([0,1])
 
 % plots permeability
 figure
 plot(time(1:end-n_av)/3600,perm_LMHB)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Membrane Permeability Over Time")
 xlabel('Time (h)')
 ylabel('Permeability (LMH/bar)')
-ylim([0,6])
+ylim([0,0.2])
 
 % plots osmotic pressure
 figure
 plot(time/3600,pi_bar)
-xline(empty_time./3600)
+%xline(empty_time./3600)
 title("Osmotic Pressure Over Time")
 xlabel('Time (h)')
 ylabel('Osmotic pressure (bar)')

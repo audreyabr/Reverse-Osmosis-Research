@@ -1,6 +1,7 @@
-function[] = pres_CaSO4_analysis(time_list,conductivity_list,tank_volume_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,P_psi)
+function[] = pres_CaSO4_analysis(time_list2,time_list1, conductivity_list1, conductivity_list2,tank_volume_list2,tank_volume_list1, flowrate_list1,flowrate_list2,permeate_flowrate_list2,permeate_flowrate_list1, permeate_volume_list2,permeate_volume_list1, tank_state_list1,tank_state_list2,P_psi)
 % This function takes in data lists and setting conditions of each test with
-% NaCl and CaSO4. It generates graphs including flux over time, permeability
+% NaCl and CaSO4. It generates graphs including flux over time,
+% permeability
 % over time, etc. 
 
 % Inputs:
@@ -16,6 +17,13 @@ function[] = pres_CaSO4_analysis(time_list,conductivity_list,tank_volume_list,fl
     %         osmotic pressure and concentration.
     % perm_LMHB: L/m2.h.bar, permeability calculated with flux and osmotic pressure 
 
+time_list = [time_list1; time_list2 + time_list1(end)];
+conductivity_list = [conductivity_list1; conductivity_list2];
+flowrate_list = [flowrate_list1; flowrate_list2];
+permeate_flowrate_list = [permeate_flowrate_list1; permeate_flowrate_list2];
+permeate_volume_list = [permeate_volume_list1; permeate_volume_list2+permeate_volume_list1(end)];
+tank_state_list = [tank_state_list1; tank_state_list2];
+tank_volume_list = [tank_volume_list1; tank_volume_list2];
 
 % Input data
 D = [length(time_list),length(conductivity_list),length(tank_volume_list),length(flowrate_list),length(permeate_flowrate_list),length(permeate_volume_list)];
@@ -31,8 +39,9 @@ mass = permeate_volume_list(1:data_length);                       % mass, g
 
 tank_state = tank_state_list(1:data_length);                      % tank states, (0=empty,1=neither,2=full)
 [r,c] = find(tank_state == 0);
+[r1,c1] = find(tank_state == 2);
 empty_time = time(r);
-        
+full_time = time(r1);       
 %% calculates and plots salinity ,flux, and permeability
 
 % preset parameters
@@ -70,23 +79,25 @@ perm_LMHB = flux_lmh ./ (P_bar-pi_bar(1:end-n_av)); %LMH/bar, permeability
 % plots conductivity over time
 figure
 hold on
+yyaxis right
+ylabel("Conductivity (mS/cm)")
 plot(time/3600, conductivity)
 %xline(empty_time./3600)
-title("Conductivity of Water Over Time")
-xlabel("Time (h)")
-ylabel("Conductivity (mS/cm)")
-ylim([0,25])
-hold off
+% title("Conductivity of Water Over Time")
+% xlabel("Time (h)")
+% ylim([0,25])
+hold on
 
 % plots tank volume over time
-figure
-hold on
-plot(time/3600, tank_volume,"r*")
-%xline(empty_time./3600)
+% figure
+% hold on
+yyaxis left
+ylabel("Volume (L)")
+plot(time/3600, tank_volume/1000,"r*")
+xline(empty_time./3600)
 title("Tank Volume Over Time")
 xlabel("Time (h)")
-ylabel("Volume (mL)")
-ylim([0,10000])
+%ylim([0,10000])
 hold off
 % 
 % plots flow rate over time
@@ -108,7 +119,7 @@ plot(time/3600, permeate_flow_rate)
 title("Flow Rate of Permeate Over Time")
 xlabel("Time (h)")
 ylabel("Flow Rate (mL/min)")
-ylim([-1 15])
+ylim([-1 40])
 hold off
 
 % plots mass over time
@@ -128,7 +139,7 @@ plot(time(1:end-n_av)/3600, flux_lmh)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-%ylim([0,3])
+ylim([0,90])
 
 % plots salinity
 figure
@@ -137,7 +148,7 @@ plot(time/3600, sal_mM_av)
 title("Salinity Over Time")
 xlabel('Time (h)')
 ylabel('Salinity (mM CaSO4)')
-ylim([0,55])
+ylim([0,75])
 
 % plots recover rate
 figure
@@ -155,7 +166,7 @@ plot(time(1:end-n_av)/3600,perm_LMHB)
 title("Membrane Permeability Over Time")
 xlabel('Time (h)')
 ylabel('Permeability (LMH/bar)')
-ylim([0,0.2])
+%ylim([0,20])
 
 % plots osmotic pressure
 figure
