@@ -104,7 +104,7 @@ while run == 1
     
     % tank empty: flush -> feed + flush -> feed to full
     if(conductivity_list(end) >= end_conductivity)||tank_state_list(end) == 0
-         disp(conductivity_list(end))
+        disp(conductivity_list(end))
          
         % flush brine to max low
         if tank_volume_list(end) >= max_flush_volume % if tank level above min level
@@ -116,7 +116,7 @@ while run == 1
         
             while tank_volume_list(end) >= max_flush_volume % while tank is above min level
                 disp("1-Flushing")
-                 disp(conductivity_list(end))
+                disp(conductivity_list(end))
                 % data collections
                 [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
 
@@ -139,7 +139,7 @@ while run == 1
                 disp(conductivity_list(end))
             elseif i == 0
                 disp("3.1-Finished flushing, still feeding")
-             disp(conductivity_list(end))
+                disp(conductivity_list(end))
             end 
             % data collections
             [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
@@ -171,7 +171,7 @@ while run == 1
             pause(pause_time) % valve delay time
             while conductivity_list(end) > initial_conductivity + conductivity_buffer && tank_volume_list(end) >= max_flush_volume
                 disp("4.1-Flushing after tank full")
-                 disp(conductivity_list(end))
+                disp(conductivity_list(end))
                 % data collections
                 [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
 
@@ -196,7 +196,7 @@ while run == 1
                 
                 % Check final volume
                 while tank_volume_list(end) < full_tank_volume
-                   disp("4.3-Refeeding")
+                    disp("4.3-Refeeding")
                     disp(conductivity_list(end))
                     % data collections
                     [time_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, tank_volume_list] = main_data_collection(dq, time_list, tank_volume_list, permeate_flowrate_list, flowrate_list, conductivity_list, permeate_volume_list, tank_state_list, filename,t, empty_tank_volume, full_tank_volume);
