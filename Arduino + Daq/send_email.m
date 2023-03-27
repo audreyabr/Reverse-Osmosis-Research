@@ -18,6 +18,7 @@ function [email] = send_email(flowrate_list,email)
             mail = h.CreateItem('olMail');
             mail.Subject = 'system is dry';
             mail.To = 'aabraham@olin.edu';
+            mail.cc = 'aabraham@olin.edu'; % change to someone else's email
             mail.BodyFormat = 'olFormatHTML';
             mail.HTMLBody = [num2str(mean(flowrate_list(end-10:end))), ' mL/min'];
         
