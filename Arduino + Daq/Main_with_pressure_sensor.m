@@ -5,7 +5,7 @@
 % batch: 0-close, 1-open
 
 clear
-filename = '3-21-test.csv';
+filename = '3-26-test.csv';
 
 % setup pins 
 trigger_pin= 'D8';
@@ -36,11 +36,11 @@ ch03ai.TerminalConfig = 'Differential';
 %%
 %CONSTANTS
 RR = 0.8;
-empty_tank_volume = 169.375; % mL
-full_tank_volume = 1388.8;  % mL
+empty_tank_volume = 35.5; % mL
+full_tank_volume = 892.5;  % mL
 pause_time = 0.5; % seconds, waiting time between arduino operations
-max_flush_volume = 80; % mL,pressure sensor measurement of tank volume that stops flushing
-end_concentration = 0.020; % M (molar!)
+max_flush_volume = 35.5; % mL,pressure sensor measurement of tank volume that stops flushing
+end_concentration = 0.025; % M (molar!)
 
 
 % initialize
@@ -94,7 +94,7 @@ while run == 1
     disp(conductivity_list(end))
     % tank not empty: maintain normal state
     if(conductivity_list(end) < end_conductivity)&&(tank_state_list(end) ~= 0)
-        writeDigitalPin(a,batch_valve_pin,1); % open batch valve
+        writeDigitalPin(a,batch_valve_pin,0); % open batch valve
         pause(pause_time) % valve delay time
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
         pause(pause_time) % valve delay time

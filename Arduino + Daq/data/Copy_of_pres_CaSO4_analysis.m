@@ -78,16 +78,16 @@ ylabel("Conductivity (mS/cm)")
 ylim([0,10])
 hold off
 
-% % plots tank volume over time
-% figure
-% hold on
-% plot(time/3600, tank_volume,"r*")
-% xline(empty_time./3600)
-% title("Tank Volume Over Time")
-% xlabel("Time (h)")
-% ylabel("Volume (mL)")
-% ylim([0,10000])
-% hold off
+% plots tank volume over time
+figure
+hold on
+plot(time/3600, tank_volume_list,"r*")
+xline(empty_time./3600)
+title("Tank Volume Over Time")
+xlabel("Time (h)")
+ylabel("Volume (mL)")
+ylim([0,10000])
+hold off
 % 
 % plots flow rate over time
 figure
@@ -130,14 +130,14 @@ xlabel('Time (h)')
 ylabel('Flux (lmh)')
 ylim([20,140])
 
-% % plots salinity
-% figure
-% plot(time/3600, sal_mM_av)
-% xline(empty_time./3600)
-% title("Salinity Over Time")
-% xlabel('Time (h)')
-% ylabel('Salinity (mM CaSO4)')
-% ylim([0,40])
+% plots salinity
+figure
+plot(time/3600, sal_mM_av)
+xline(empty_time./3600)
+title("Salinity Over Time")
+xlabel('Time (h)')
+ylabel('Salinity (mM CaSO4)')
+ylim([0,40])
 
 % plots recover rate
 figure
