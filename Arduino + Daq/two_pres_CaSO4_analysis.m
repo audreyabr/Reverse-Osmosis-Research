@@ -1,4 +1,4 @@
-function [] = Copy_of_pres_CaSO4_analysis(time_list,conductivity_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,P_psi)
+function [] = pres_CaSO4_analysis(time_list,conductivity_list,flowrate_list,permeate_flowrate_list,permeate_volume_list,tank_state_list,tank_volume_list,P_psi)
 % This function takes in data lists and setting conditions of each test with
 % NaCl and CaSO4. It generates graphs including flux over time, permeability
 % over time, etc. 
@@ -24,7 +24,7 @@ data_length = min(D,[],"all");
 % assigning variables
 time = time_list(1:data_length);                                  % time, seconds
 conductivity = conductivity_list(1:data_length);                  % conductivity, mS/cm
-% tank_volume = tank_volume_list(1:data_length);                          % distance, cm
+tank_volume = tank_volume_list(1:data_length);                          % distance, cm
 batch_flow_rate = flowrate_list(1:data_length);                   % flow rate, mL/min
 permeate_flow_rate = permeate_flowrate_list(1:data_length);       % flow rate, mL/min
 mass = permeate_volume_list(1:data_length);                       % mass, g
@@ -75,7 +75,7 @@ xline(empty_time./3600)
 title("Conductivity of Water Over Time")
 xlabel("Time (h)")
 ylabel("Conductivity (mS/cm)")
-ylim([0,10])
+ylim([0,15])
 hold off
 
 % plots tank volume over time
@@ -128,7 +128,7 @@ xline(empty_time./3600)
 title("Flux Over Time")
 xlabel('Time (h)')
 ylabel('Flux (lmh)')
-ylim([20,140])
+ylim([0,100])
 
 % plots salinity
 figure
