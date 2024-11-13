@@ -15,7 +15,7 @@ time_list = [0];
 batch_flowrate_list = [0];
 permeate_flowrate_list= [0];
 permeate_volume_list = [0];
-
+ 
 t = tic();
 run = 1;
 

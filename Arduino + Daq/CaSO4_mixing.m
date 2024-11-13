@@ -5,7 +5,7 @@ function [grams_CaCl_dihydrate,grams_Na2SO4] = CaSO4_mixing(concentration,volume
 %Emily made 3 updates 6/28/22
     %Changed molar mass of calcium salt to 147.01 [g/mol] because we have calcium
         %chloride dihydrate, which has 2 water molecules per molecule of
-        %salt, in lab (also changed name of output to refect that)
+        %salt, in lab(also changed name of output to refect that)
     %Stylistic:
         %Changed capitalization of CaSO4 (O is capital bc oxygen)
         %Changed mol to molarmass and moles because the same name ("mol") was 
