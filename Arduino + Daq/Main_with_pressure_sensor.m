@@ -94,7 +94,7 @@ while run == 1
     disp(conductivity_list(end))
     % tank not empty: maintain normal state
     if(conductivity_list(end) < end_conductivity)&&(tank_state_list(end) ~= 0)
-        writeDigitalPin(a,batch_valve_pin,0); % open batch valve
+        writeDigitalPin(a,batch_valve_pin,1); % open batch valve
         pause(pause_time) % valve delay time
         writeDigitalPin(a,feed_valve_pin,1);% close feed valve
         pause(pause_time) % valve delay time
