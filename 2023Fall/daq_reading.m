@@ -7,7 +7,7 @@ function [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_
     % taking multiple readings from each input pin
     for i = 1:index
         daqName.Rate = 5000;
-        display(read(daqName, "OutputFormat", "Matrix"))
+        %display(read(daqName, "OutputFormat", "Matrix"))
         voltage_list(i,1:2) = read(daqName, "OutputFormat", "Matrix");
 
     end 
@@ -17,7 +17,7 @@ function [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_
     batch_voltage = mean_voltage_list(2);
 
     % convert voltage values into flowrates
-    permeate_flowrate = permeate_voltage *20;
+    permeate_flowrate = permeate_voltage *20
     batch_flowrate = batch_voltage *200;
 
     % append to flowrate lists
