@@ -6,6 +6,6 @@ plot(time_list_trim/60, permeate_flowrate_list)
 xlabel("time(min)")
 ylabel("permeate flowrate(ml/min)")
 
-%ylim([0 25])
+%xlim([0 100])
 end
 

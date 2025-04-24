@@ -5,6 +5,8 @@ d = daqlist;
 dq = daq("ni");
 Daqtype = d.DeviceID;
 
+filename = '04-22-25-try38.mat';
+
 ch00ai = addinput(dq,Daqtype,'ai0','Voltage');  % permeate flowrate in Channel AI0(+)
 ch00ai.TerminalConfig = 'Differential';
 ch01ai = addinput(dq,Daqtype,'ai1','Voltage');  % batch flowrate in Channel AI1(+)
@@ -23,5 +25,8 @@ while run == 1
     time_now = toc(t); 
     time_list = time_readings(time_list, time_now);
     [permeate_flowrate_list, permeate_flowrate, batch_flowrate_list, batch_flowrate] = daq_reading(dq, permeate_flowrate_list, batch_flowrate_list);
- 
+   if (rem(size(time_list,1),150) == 0)
+    tobesaved = [time_list, permeate_flowrate_list, batch_flowrate_list]; 
+    save(filename, 'time_list', "permeate_flowrate_list", 'batch_flowrate_list');
+   end
 end 
