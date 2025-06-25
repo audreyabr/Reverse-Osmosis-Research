@@ -6,6 +6,8 @@ function trial = filter_and_process(trial)
         trial(i).permeateFlux = trial(i).permeate_flowrate_list * .06 / 21982.45e-6;
         trial(i).concentration = (trial(i).ConductivityStart - 0.656)/323.55;
         trial(i).membraneConcentration = concentrationPolarization(trial(i).batch_flowrate_list, trial(i).permeate_flowrate_list, trial(i).concentration);
+        trial(i).membraneGypsumSI = 0.527*log(trial(i).membraneConcentration) + 2.1365;
+        trial(i).bulkGypsumSI = 0.527*log(extractfield(trial(i), 'concentration')) + 2.1365;
         trial(i).membraneConcentrationMean = mean(trial(i).membraneConcentration);
         if(isnan(trial(i).ScaleTime1))
             trial(i).batchFlowPrescaleMean = NaN;
