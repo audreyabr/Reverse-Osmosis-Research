@@ -1,5 +1,5 @@
 function trial = load_results(trial)
-results = readtable("C:/Users/tewald/Downloads/Results2025")
+results = readtable("Results2025")
 
 %%%Assign Conducitivy at Start to Trial Matrix
 for i = 1:size(trial,2)
