@@ -9,15 +9,15 @@ function trial = filter_and_process(trial)
         trial(i).membraneGypsumSI = 0.527*log(trial(i).membraneConcentration) + 2.1365;
         trial(i).bulkGypsumSI = 0.527*log(extractfield(trial(i), 'concentration')) + 2.1365;
         trial(i).membraneConcentrationMean = mean(trial(i).membraneConcentration);
-        if(isnan(trial(i).ScaleTime1))
+        if(isnan(trial(i).ScaleTimeA))
             trial(i).batchFlowPrescaleMean = NaN;
             trial(i).membraneConcentrationPrescaleMean = NaN;
-        elseif(isempty(trial(i).time_list) || trial(i).ScaleTime1 > (trial(i).time_list(end))/60)
+        elseif(isempty(trial(i).time_list) || trial(i).ScaleTimeA > (trial(i).time_list(end))/60)
             trial(i).batchFlowPrescaleMean = trial(i).batchFlowMean;
             trial(i).membraneConcentrationPrescaleMean = trial(i).membraneConcentrationMean;
         else
-            trial(i).batchFlowPrescaleMean = mean(trial(i).batch_flowrate_list(trial(i).time_list < trial(i).ScaleTime1*60));
-            trial(i).membraneConcentrationPrescaleMean = mean(trial(i).membraneConcentration(trial(i).time_list < trial(i).ScaleTime1*60));
+            trial(i).batchFlowPrescaleMean = mean(trial(i).batch_flowrate_list(trial(i).time_list < trial(i).ScaleTimeA*60));
+            trial(i).membraneConcentrationPrescaleMean = mean(trial(i).membraneConcentration(trial(i).time_list < trial(i).ScaleTimeA*60));
         end
     end
 %%Filter Data
