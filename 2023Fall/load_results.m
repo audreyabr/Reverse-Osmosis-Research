@@ -13,6 +13,8 @@ for i = 1:size(trial,2)
         trial(i).ScaleTimeA = results.TroughTime_min_(results.TrialNumber == i);
         trial(i).ScaleTimeB = results.PeakTime_min_(results.TrialNumber == i);
         trial(i).ScaleTimeC = results.CessationTime_min_(results.TrialNumber == i);
+        trial(i).FluxOffset = results.FluxOffset_lmh_(results.TrialNumber == i);
+
     else
         trial(i).ConductivityStart = NaN;
         trial(i).ConductivityEnd = NaN;
@@ -23,6 +25,7 @@ for i = 1:size(trial,2)
         trial(i).ScaleTimeA = NaN(1);
         trial(i).ScaleTimeB = NaN(1);       
         trial(i).ScaleTimeC = NaN(1);
+        trial(i).FluxOffset = NaN(1);
     end
 
 end

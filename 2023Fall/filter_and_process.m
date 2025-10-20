@@ -3,9 +3,9 @@ function trial = filter_and_process(trial)
     for i = 1:size(trial,2)
         
         trial(i).batchFlowMean = mean(trial(i).batch_flowrate_list);
-        trial(i).permeateFlux = trial(i).permeate_flowrate_list * .06 / 21982.45e-6;
+        trial(i).permeateFlux = trial(i).permeate_flowrate_list * .06 / 21982.45e-6-trial(i).FluxOffset;
         trial(i).concentration = (trial(i).ConductivityStart - 0.656)/323.55;
-        trial(i).membraneConcentration = concentrationPolarization(trial(i).batch_flowrate_list, trial(i).permeate_flowrate_list, trial(i).concentration);
+        trial(i).membraneConcentration = concentrationPolarization(trial(i).batch_flowrate_list, trial(i).permeateFlux, trial(i).concentration);
         trial(i).membraneGypsumSI = 0.527*log(trial(i).membraneConcentration) + 2.1365;
         trial(i).bulkGypsumSI = 0.527*log(extractfield(trial(i), 'concentration')) + 2.1365;
         trial(i).membraneConcentrationMean = mean(trial(i).membraneConcentration);
@@ -27,6 +27,7 @@ function trial = filter_and_process(trial)
         trial(i).batchFlowrateFiltered = lowpass(trial(i).batch_flowrate_list, .1);
         trial(i).permeateFlowrateFiltered = lowpass(trial(i).permeate_flowrate_list, .1);
         trial(i).membraneConcentrationFiltered = lowpass(trial(i).membraneConcentration, .1);
+        trial(i).membraneGypsumSIFiltered = lowpass(trial(i).membraneGypsumSI, .1);
         trial(i).permeateFluxFiltered = lowpass(trial(i).permeateFlux, .1);
         end
     end

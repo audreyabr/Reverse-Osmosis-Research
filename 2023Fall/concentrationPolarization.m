@@ -1,10 +1,11 @@
-function [cm_avg_list,Gz_m, Sh_avg,kf_avg] = concentrationPolarization(batch_flow, permeate_flow, bulk_concentration)
+function [cm_avg_list,Gz_m, Sh_avg,kf_avg] = concentrationPolarization(batch_flow, perm_fluxLMH, bulk_concentration)
 length = 0.24352;%m  length of channel
 thickness = 0.001; %m    thickness of channel
 width = 0.09112; %m   width of channel
 crossSection = thickness*width; %m^2 horizontal cross section area of channel
-membrane_Area = length*width; %m^2  area of membrane
-perm_flux = permeate_flow/1e6/60/membrane_Area; %m/s flux rate through membrane
+%membrane_Area = length*width; %m^2  area of membrane
+%perm_flux = permeate_flow/1e6/60/membrane_Area; %m/s flux rate through membrane
+perm_flux = perm_fluxLMH/3.6e6; %m/s flux rate through membrane
 D_s = 7.98e-10; %m^2/s   diffusion coefficent of caso4 at 20C
 visc = 1.0035e-6; % m^2/s KINEMATIC viscosity of water at 20C
 D_h = 2*thickness; %m   hydraulic diameter of channel
