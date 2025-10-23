@@ -19,6 +19,13 @@ function trial = filter_and_process(trial)
             trial(i).batchFlowPrescaleMean = mean(trial(i).batch_flowrate_list(trial(i).time_list < trial(i).ScaleTimeA*60));
             trial(i).membraneConcentrationPrescaleMean = mean(trial(i).membraneConcentration(trial(i).time_list < trial(i).ScaleTimeA*60));
         end
+        if trial(i).DidNotScale == 1
+            trial(i).EndTimeNoScale = trial(i).time_list(end);
+            trial(i).batchFlowPrescaleMean = trial(i).batchFlowMean;
+            trial(i).membraneConcentrationPrescaleMean = trial(i).membraneConcentrationMean;
+        else
+            trial(i).EndTimeNoScale = NaN;
+        end
     end
 %%Filter Data
     for i = 1:size(trial,2)
