@@ -15,28 +15,22 @@ function trial = filter_and_process(trial)
         if(isnan(trial(i).ScaleTime60))
             trial(i).batchFlowPrescaleMean = NaN;
             trial(i).membraneConcentrationPrescaleMean = NaN;
-            %trial(i).membraneConc60=NaN;
         elseif(isempty(trial(i).time_list) || trial(i).ScaleTime60 > (trial(i).time_list(end))/60)
             trial(i).batchFlowPrescaleMean = trial(i).batchFlowMean;
             trial(i).membraneConcentrationPrescaleMean = trial(i).membraneConcentrationMean;
-            %trial(i).membraneConc60=NaN;
         else
             trial(i).batchFlowPrescaleMean = mean(trial(i).batch_flowrate_list(trial(i).time_list < trial(i).ScaleTime60*60));
             trial(i).membraneConcentrationPrescaleMean = mean(trial(i).membraneConcentration(trial(i).time_list < trial(i).ScaleTime60*60));
-            %trial(i).membraneConc60 = trial(i).membraneConcentration(trial(i).time_list == trial(i).ScaleTime60*60);
+            trial(i).membraneConc60 = trial(i).membraneConcentration(trial(i).time_list = trial(i).ScaleTime60*60);
         end
         if trial(i).DidNotScale == 1
             trial(i).EndTimeNoScale = trial(i).time_list(end);
             trial(i).batchFlowPrescaleMean = trial(i).batchFlowMean;
             trial(i).membraneConcentrationPrescaleMean = trial(i).membraneConcentrationMean;
-            %trial(i).membraneConc60=NaN;
         else
             trial(i).EndTimeNoScale = NaN;
-            %trial(i).membraneConc60=NaN;
         end
         trial(i).membraneSIPrescaleMean = 0.527*log(trial(i).membraneConcentrationPrescaleMean) + 2.1365;
-        %trial(i).membraneSI60 = 0.527*log(trial(i).membraneConc60) + 2.1365;
-
     end
 %%Filter Data
     for i = 1:size(trial,2)
