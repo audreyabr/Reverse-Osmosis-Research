@@ -12,6 +12,17 @@ function trial = filter_and_process(trial)
         trial(i).membraneGypsumIndTime = indTimeGypsumOfSI(trial(i).membraneGypsumSI);
         trial(i).membraneNucRate = 1./trial(i).membraneGypsumIndTime;
         trial(i).membraneNucLik = cumsum(trial(i).membraneNucRate);
+        [~,idx2min]=min(abs(trial(i).time_list-2*60));
+        [~,idx10min]=min(abs(trial(i).time_list-10*60));
+        if length(trial(i).permeateFlux)>=idx10min
+        trial(i).earlyPermeateFlux=mean(trial(i).permeateFlux(idx2min:idx10min));
+        trial(i).earlyMembraneConcentration = concentrationPolarization(mean(trial(i).batch_flowrate_list), trial(i).earlyPermeateFlux, trial(i).concentration);
+        trial(i).earlyMembraneGypsumSI = 0.527*log(trial(i).earlyMembraneConcentration) + 2.1365;
+        else
+        trial(i).earlyPermeateFlux=NaN;
+        trial(i).earlyMembraneConcentration =NaN;
+        trial(i).earlyMembraneGypsumSI  =NaN;
+        end
         if(isnan(trial(i).ScaleTime60))
             trial(i).batchFlowPrescaleMean = NaN;
             trial(i).membraneConcentrationPrescaleMean = NaN;
