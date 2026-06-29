@@ -1,4 +1,4 @@
-function [tiGypsum] = indtimeGypsum(SI)
+function [tiGypsum] = indTimeGypsumOfSI(SI)
 % returns the nucleation induction time of Gypsum in seconds given SI
 %
 % from:
