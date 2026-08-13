@@ -50,14 +50,15 @@ function trial = filter_and_process(trial)
 
     end
 %%Filter Data
+cutoff=0.0001;%0.01 change in manuscript
     for i = 1:size(trial,2)
         disp("Trial #" + i)
         if(~isempty(trial(i).time_list) && ~isnan(trial(i).concentration))
-        trial(i).batchFlowrateFiltered = lowpass(trial(i).batch_flowrate_list, .1);
-        trial(i).permeateFlowrateFiltered = lowpass(trial(i).permeate_flowrate_list, .1);
-        trial(i).membraneConcentrationFiltered = lowpass(trial(i).membraneConcentration, .1);
-        trial(i).membraneGypsumSIFiltered = lowpass(trial(i).membraneGypsumSI, .1);
-        trial(i).permeateFluxFiltered = lowpass(trial(i).permeateFlux, .1);
+        trial(i).batchFlowrateFiltered = lowpass(trial(i).batch_flowrate_list, cutoff);
+        trial(i).permeateFlowrateFiltered = lowpass(trial(i).permeate_flowrate_list, cutoff);
+        trial(i).membraneConcentrationFiltered = lowpass(trial(i).membraneConcentration, cutoff);
+        trial(i).membraneGypsumSIFiltered = lowpass(trial(i).membraneGypsumSI, cutoff);
+        trial(i).permeateFluxFiltered = lowpass(trial(i).permeateFlux, cutoff);
         end
     end
 end
