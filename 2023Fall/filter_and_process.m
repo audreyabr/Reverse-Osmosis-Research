@@ -50,7 +50,7 @@ function trial = filter_and_process(trial)
 
     end
 %%Filter Data
-cutoff=0.0001;%0.01 change in manuscript
+cutoff=0.01;%0.1 change in manuscript
     for i = 1:size(trial,2)
         disp("Trial #" + i)
         if(~isempty(trial(i).time_list) && ~isnan(trial(i).concentration))
